@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Pro v6 — Complete Shop Management</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1a1a;--ink2:#555;--ink3:#888;
+  --s:#fff;--s2:#f7f6f2;--s3:#eeede8;
+  --b:rgba(0,0,0,0.08);--b2:rgba(0,0,0,0.14);
+  --blue:#1a4fa0;--bl:#e8effe;--bt:#0c447c;
+  --green:#1a7a4a;--gl:#e6f4ec;--gt:#1a5c38;
+  --red:#c0392b;--rl:#fdecea;--rt:#7b1f1f;
+  --amb:#92600a;--al:#fef3dc;--at:#5c3d06;
+  --pur:#5b21b6;--pul:#f5f3ff;--put:#3b0f8c;
+  --acc:#2563eb;
+  --font:IBM Plex Sans,system-ui,sans-serif;
+  --mono:IBM Plex Mono,monospace;
+}
+body{font-family:var(--font);color:var(--ink);background:var(--s3);font-size:13px;min-height:100vh}
+.app{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+/* SIDEBAR */
+.sb{background:var(--s2);border-right:1px solid var(--b2);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-brand{padding:14px 13px 11px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px}
+.sb-ico{width:30px;height:30px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-ico svg{width:15px;height:15px;fill:#fff}
+.sb-n{font-size:13px;font-weight:600;color:var(--ink);line-height:1.2}
+.sb-s{font-size:10px;color:var(--ink3);font-family:var(--mono)}
+.ns{padding:10px 10px 3px;font-size:10px;font-weight:600;color:var(--ink3);letter-spacing:.07em;text-transform:uppercase}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;margin:1px 7px;cursor:pointer;font-size:12px;color:var(--ink2);transition:all .12s;user-select:none}
+.ni:hover{background:var(--s3);color:var(--ink)}
+.ni.active{background:var(--blue);color:#fff}
+.ni-d{width:4px;height:4px;border-radius:50%;background:var(--b2);flex-shrink:0}
+.ni.active .ni-d{background:rgba(255,255,255,.6)}
+.nb{margin-left:auto;font-size:10px;background:var(--rl);color:var(--rt);padding:1px 5px;border-radius:9px;font-family:var(--mono)}
+.sb-bot{margin-top:auto;padding:10px;border-top:1px solid var(--b)}
+.ai-btn{background:var(--blue);color:#fff;border-radius:8px;padding:9px 11px;cursor:pointer;font-size:12px;transition:opacity .15s}
+.ai-btn:hover{opacity:.88}
+.backup-status{font-size:10px;color:var(--ink3);text-align:center;padding:5px 0 0;font-family:var(--mono)}
+/* MAIN */
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{background:var(--s);border-bottom:1px solid var(--b2);display:flex;align-items:center;padding:11px 18px;gap:10px;position:sticky;top:0;z-index:10}
+.tb-t{font-size:14px;font-weight:600;color:var(--ink);flex:1}
+.tb-d{font-size:11px;color:var(--ink3);font-family:var(--mono)}
+.ac{display:flex;align-items:center;gap:4px;background:var(--rl);color:var(--rt);padding:4px 9px;border-radius:16px;font-size:11px;font-weight:500;cursor:pointer}
+.content{padding:14px 18px;display:flex;flex-direction:column;gap:13px}
+.view{display:none}.view.active{display:flex;flex-direction:column;gap:13px}
+/* CARDS */
+.mg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mg3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mc{background:var(--s);border-radius:9px;padding:12px 14px;border:1px solid var(--b)}
+.ml{font-size:11px;color:var(--ink3);margin-bottom:5px;font-weight:500}
+.mv{font-size:20px;font-weight:600;color:var(--ink);line-height:1;font-family:var(--mono)}
+.ms{font-size:11px;margin-top:3px;font-weight:500}
+.up{color:var(--gt)}.dn{color:var(--rt)}.wn{color:var(--at)}.mu{color:var(--ink3)}
+/* PANELS */
+.r2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px}
+.r3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.panel{background:var(--s);border:1px solid var(--b2);border-radius:10px;padding:13px 15px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;gap:8px;flex-wrap:wrap}
+.pt{font-size:13px;font-weight:600;color:var(--ink)}
+.plink{font-size:11px;color:var(--acc);cursor:pointer;background:none;border:none;font-family:inherit;padding:0}
+/* FORMS */
+.lbl{font-size:11px;font-weight:500;color:var(--ink2);margin-bottom:3px;display:block}
+.inp{border:1px solid var(--b2);border-radius:6px;padding:7px 9px;font-size:12px;background:var(--s2);color:var(--ink);font-family:var(--font);outline:none;width:100%;transition:border-color .12s}
+.inp:focus{border-color:var(--acc);background:var(--s)}
+.sel{border:1px solid var(--b2);border-radius:6px;padding:7px 9px;font-size:12px;background:var(--s2);color:var(--ink);outline:none;width:100%;cursor:pointer}
+.sel:focus{border-color:var(--acc)}
+.textarea{border:1px solid var(--b2);border-radius:6px;padding:7px 9px;font-size:12px;background:var(--s2);color:var(--ink);font-family:var(--font);outline:none;width:100%;resize:vertical;min-height:80px}
+.textarea:focus{border-color:var(--acc);background:var(--s)}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fgrid{display:grid;gap:10px;margin-bottom:12px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+/* BUTTONS */
+.btn{background:var(--blue);color:#fff;border:none;border-radius:7px;padding:8px 15px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s}
+.btn:hover{opacity:.87}
+.btn-s{background:var(--s2);color:var(--ink);border:1px solid var(--b2);border-radius:7px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:var(--font);transition:background .12s}
+.btn-s:hover{background:var(--s3)}
+.btn-g{background:var(--gl);color:var(--gt);border:1px solid rgba(26,122,74,.2);border-radius:7px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:var(--font);font-weight:500}
+.btn-r{background:var(--rl);color:var(--rt);border:1px solid rgba(192,57,43,.2);border-radius:7px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:var(--font);font-weight:500}
+.btn-a{background:var(--al);color:var(--at);border:1px solid rgba(146,96,10,.2);border-radius:7px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:var(--font);font-weight:500}
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:11px;font-weight:500;color:var(--ink3);padding:6px 7px;text-align:left;border-bottom:1px solid var(--b2);white-space:nowrap}
+.tbl td{padding:7px 7px;border-bottom:1px solid var(--b);color:var(--ink);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--s2)}
+.tbl-wrap{overflow-x:auto}
+/* TAGS */
+.tag{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:500;white-space:nowrap;display:inline-block}
+.tg-b{background:var(--bl);color:var(--bt)}
+.tg-g{background:var(--gl);color:var(--gt)}
+.tg-r{background:var(--rl);color:var(--rt)}
+.tg-a{background:var(--al);color:var(--at)}
+.tg-m{background:var(--s3);color:var(--ink2)}
+.tg-p{background:var(--pul);color:var(--put)}
+.mono{font-family:var(--mono)}
+.nr{text-align:center;padding:22px;color:var(--ink3);font-size:12px}
+.msg-ok{color:var(--gt);font-size:11px;font-weight:500}
+.msg-err{color:var(--rt);font-size:11px;font-weight:500}
+/* SN INPUT */
+.sn-area{background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:10px 12px}
+.sn-title{font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.sn-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.sn-row input{flex:1;border:1px solid var(--b2);border-radius:5px;padding:5px 8px;font-size:12px;background:var(--s);color:var(--ink);outline:none;font-family:var(--mono)}
+.sn-row input:focus{border-color:var(--acc)}
+.sn-del{background:var(--rl);color:var(--rt);border:none;border-radius:4px;padding:3px 7px;font-size:11px;cursor:pointer;flex-shrink:0}
+.sn-add-btn{font-size:11px;color:var(--acc);cursor:pointer;background:none;border:none;padding:2px 0;font-family:inherit}
+.sn-bulk{width:100%;border:1px solid var(--b2);border-radius:5px;padding:6px 8px;font-size:12px;background:var(--s);color:var(--ink);font-family:var(--mono);resize:vertical;min-height:70px;outline:none}
+.sn-bulk:focus{border-color:var(--acc)}
+.sn-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bl);color:var(--bt);border-radius:4px;padding:2px 7px;font-size:11px;margin:2px;font-family:var(--mono)}
+.sn-tag .rm{cursor:pointer;opacity:.6;font-size:10px}
+.sn-tag .rm:hover{opacity:1}
+/* FAST STOCK ENTRY */
+.fse-row{display:grid;grid-template-columns:1fr 80px 90px 100px 36px;gap:7px;align-items:start;padding:7px 0;border-bottom:1px solid var(--b)}
+.fse-row:last-child{border-bottom:none}
+.fse-hdr{display:grid;grid-template-columns:1fr 80px 90px 100px 36px;gap:7px;padding:5px 0 7px;border-bottom:1px solid var(--b2);font-size:11px;font-weight:500;color:var(--ink3)}
+.fse-sn-toggle{font-size:10px;color:var(--acc);cursor:pointer;padding:2px 0;background:none;border:none;font-family:inherit}
+.fse-sn-wrap{grid-column:1/-1;padding:6px 0 2px}
+/* ANALYTICS */
+.abar{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--b)}
+.abar:last-child{border-bottom:none}
+.abar-rank{font-size:10px;color:var(--ink3);width:16px;text-align:center;flex-shrink:0;font-family:var(--mono)}
+.abar-name{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.abar-bg{width:80px;height:5px;background:var(--s3);border-radius:3px;flex-shrink:0}
+.abar-fill{height:100%;border-radius:3px}
+.abar-val{font-size:11px;font-family:var(--mono);color:var(--ink2);width:52px;text-align:right;flex-shrink:0}
+/* CHAT */
+.chat-wrap{background:var(--s);border:1px solid var(--b2);border-radius:10px;display:flex;flex-direction:column;height:500px}
+.ch-hdr{padding:10px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:7px;flex-shrink:0}
+.cdot{width:7px;height:7px;border-radius:50%;background:#22c55e}
+.msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+.msg{display:flex;gap:7px}
+.msg-u{flex-direction:row-reverse}
+.mav{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0}
+.aav{background:var(--bl);color:var(--bt)}.uav{background:var(--blue);color:#fff}
+.bbl{max-width:88%;padding:8px 11px;border-radius:9px;font-size:12px;line-height:1.55}
+.abbl{background:var(--s2);color:var(--ink);border-radius:2px 9px 9px 9px}
+.ubbl{background:var(--blue);color:#fff;border-radius:9px 2px 9px 9px}
+.thinking{display:flex;gap:3px;padding:9px 11px;background:var(--s2);border-radius:2px 9px 9px 9px;width:48px}
+.dp{width:5px;height:5px;border-radius:50%;background:var(--ink3);animation:dp 1.2s ease-in-out infinite}
+.dp:nth-child(2){animation-delay:.2s}.dp:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.ci-row{display:flex;gap:7px;padding:9px 12px;border-top:1px solid var(--b);flex-shrink:0}
+.ci{flex:1;border:1px solid var(--b2);border-radius:7px;padding:7px 10px;font-size:12px;font-family:var(--font);background:var(--s2);color:var(--ink);outline:none;resize:none}
+.ci:focus{border-color:var(--acc)}
+.sbtn{width:35px;height:35px;background:var(--blue);border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sbtn svg{width:13px;height:13px;fill:#fff}
+.qcs{display:flex;gap:5px;flex-wrap:wrap;padding:0 12px 8px}
+.qc{font-size:11px;padding:4px 9px;border-radius:16px;background:var(--s2);border:1px solid var(--b2);cursor:pointer;color:var(--ink2);white-space:nowrap;transition:background .1s}
+.qc:hover{background:var(--s3);color:var(--ink)}
+/* SECOND HAND */
+.seller-photo{width:56px;height:56px;border-radius:7px;object-fit:cover;border:1px solid var(--b2);background:var(--s3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+/* P&L */
+.pl-r{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}
+.pl-t{border-top:1px solid var(--b2);margin-top:4px;padding-top:7px;font-weight:600}
+/* WAC */
+.wac-box{background:var(--bl);border:1px solid rgba(26,79,160,.18);border-radius:7px;padding:10px 12px;margin:8px 0}
+.wac-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12px;color:var(--bt);border-bottom:1px solid rgba(26,79,160,.08)}
+.wac-row:last-child{border-bottom:none}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--s);border-radius:11px;padding:18px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;border:1px solid var(--b2)}
+.modal-title{font-size:14px;font-weight:600;margin-bottom:13px;padding-bottom:9px;border-bottom:1px solid var(--b)}
+/* BACKUP */
+.bk-card{background:var(--s);border:1px solid var(--b2);border-radius:9px;padding:14px}
+.bk-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);cursor:pointer;user-select:none}
+.toggle{width:32px;height:18px;border-radius:9px;background:var(--s3);border:1px solid var(--b2);position:relative;transition:background .2s;cursor:pointer;flex-shrink:0}
+.toggle.on{background:var(--blue);border-color:var(--blue)}
+.toggle::after{content:'';width:12px;height:12px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s}
+.toggle.on::after{transform:translateX(14px)}
+/* PRODUCT FORM */
+.form-section{background:var(--s2);border-radius:7px;padding:10px 12px;margin-bottom:10px}
+.form-section-title{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
+/* TOOLTIP */
+.tip{font-size:10px;color:var(--ink3);margin-top:2px}
+/* BRAND CHIPS */
+.brand-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .12s;user-select:none;margin:2px}
+.brand-chip:hover{opacity:.85}
+.brand-chip.selected{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,79,160,.18)}
+.brand-chip .bx{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.variant-chip{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--b2);background:var(--s2);color:var(--ink2);transition:all .12s;margin:2px;font-family:var(--mono)}
+.variant-chip:hover{background:var(--s3);color:var(--ink)}
+.variant-chip.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:8px}
+.brand-logo-box{width:32px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;letter-spacing:.03em}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sb">
+  <div class="sb-brand">
+    <div class="sb-ico"><svg viewBox="0 0 20 20"><path d="M3 3h14v3H3zM3 8h14v9H3z"/></svg></div>
+    <div><div class="sb-n">Shop Pro</div><div class="sb-s">v6 · Full System</div></div>
+  </div>
+  <div class="ns">Main</div>
+  <div class="ni active" data-view="dash">Dashboard</div>
+  <div class="ni" data-view="analytics">Analytics</div>
+  <div class="ni" data-view="fast-stock">Fast Stock Entry</div>
+  <div class="ni" data-view="sale">Record Sale</div>
+  <div class="ni" data-view="return">Sales Return</div>
+  <div class="ni" data-view="ai">AI Agent</div>
+  <div class="ns">Inventory</div>
+  <div class="ni" data-view="products">Products <span class="nb" id="low-badge">0</span></div>
+  <div class="ni" data-view="purchase">Purchase / Restock</div>
+  <div class="ni" data-view="secondhand">Buy Second-hand</div>
+  <div class="ns">Finance</div>
+  <div class="ni" data-view="expenses">Expenses</div>
+  <div class="ni" data-view="pl">Profit &amp; Loss</div>
+  <div class="ns">Settings</div>
+  <div class="ni" data-view="employees">Employees</div>
+  <div class="ni" data-view="brands">Brands &amp; Variants</div>
+  <div class="ni" data-view="backup">Backup &amp; Export</div>
+  <div class="sb-bot">
+    <div class="ai-btn" onclick="gotoAI()">
+      <div style="font-weight:600;margin-bottom:1px">Ask AI Agent</div>
+      <div style="opacity:.7;font-size:10px">Powered by Claude</div>
+    </div>
+    <div class="backup-status" id="sb-backup-status">Auto-backup: OFF</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+<div class="topbar">
+  <span class="tb-t" id="pg-title">Dashboard</span>
+  <span class="tb-d" id="tb-date"></span>
+  <div class="ac" onclick="sv('products')">
+    <svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2L2 17h16L10 2zm-1 5h2v5H9V7zm0 6h2v2H9v-2z"/></svg>
+    <span id="alert-txt">0 low stock</span>
+  </div>
+</div>
+<div class="content">
+
+<!-- DASHBOARD -->
+<div class="view active" id="view-dash">
+  <div class="mg">
+    <div class="mc"><div class="ml">Products</div><div class="mv" id="d-prods">0</div><div class="ms mu" id="d-cats">0 categories</div></div>
+    <div class="mc"><div class="ml">Stock units</div><div class="mv" id="d-units">0</div><div class="ms mu" id="d-val"></div></div>
+    <div class="mc"><div class="ml">Total revenue</div><div class="mv" id="d-rev">৳0</div><div class="ms mu" id="d-txn"></div></div>
+    <div class="mc"><div class="ml">Net profit</div><div class="mv" id="d-profit">৳0</div><div class="ms up" id="d-margin"></div></div>
+  </div>
+  <div class="r2">
+    <div class="panel"><div class="ph"><span class="pt">Best selling</span><button class="plink" onclick="sv('analytics')">Full analytics</button></div><div id="d-best"></div></div>
+    <div class="panel"><div class="ph"><span class="pt">Trending (last 7 days)</span><button class="plink" onclick="askAI('Analyze trending products and tell me what to stock up on.')">Ask AI ↗</button></div><div id="d-trend"></div></div>
+  </div>
+  <div class="r2">
+    <div class="panel"><div class="ph"><span class="pt">Employee performance</span><button class="plink" onclick="sv('employees')">Manage</button></div><div id="d-emp"></div></div>
+    <div class="panel"><div class="ph"><span class="pt">Low stock alerts</span><button class="plink" onclick="sv('purchase')">Restock</button></div><div id="d-low"></div></div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="view" id="view-analytics">
+  <div class="mg">
+    <div class="mc"><div class="ml">Best seller</div><div class="mv" id="an-best" style="font-size:13px">—</div><div class="ms up" id="an-best-v"></div></div>
+    <div class="mc"><div class="ml">Worst seller</div><div class="mv" id="an-worst" style="font-size:13px">—</div><div class="ms dn" id="an-worst-v"></div></div>
+    <div class="mc"><div class="ml">Trending now</div><div class="mv" id="an-trend" style="font-size:13px">—</div><div class="ms up" id="an-trend-v"></div></div>
+    <div class="mc"><div class="ml">Best employee</div><div class="mv" id="an-emp" style="font-size:13px">—</div><div class="ms up" id="an-emp-v"></div></div>
+  </div>
+  <div class="r2">
+    <div class="panel"><div class="ph"><span class="pt">Product ranking — units sold</span></div><div id="an-rank"></div></div>
+    <div class="panel"><div class="ph"><span class="pt">Worst selling products</span><button class="plink" onclick="askAI('My worst selling products are shown. Should I discount, stop stocking, or reprice?')">Ask AI ↗</button></div><div id="an-worst-list"></div></div>
+  </div>
+  <div class="r2">
+    <div class="panel"><div class="ph"><span class="pt">Employee leaderboard</span><button class="plink" onclick="askAI('Compare employee performance. Who deserves a bonus? Who needs improvement?')">Ask AI ↗</button></div><div id="an-emp-board"></div></div>
+    <div class="panel"><div class="ph"><span class="pt">Trending products (7-day vs prior 7)</span></div><div id="an-trending"></div></div>
+  </div>
+</div>
+
+<!-- FAST STOCK ENTRY -->
+<div class="view" id="view-fast-stock">
+  <div class="panel">
+    <div class="ph">
+      <span class="pt">Fast stock entry — add multiple products quickly</span>
+      <div style="display:flex;gap:7px;align-items:center">
+        <input class="inp" id="fse-date" type="date" style="width:140px;padding:5px 8px">
+        <input class="inp" id="fse-sup" placeholder="Supplier (optional)" style="width:160px;padding:5px 8px">
+        <button class="btn" onclick="fseAddRow()">+ Add row</button>
+        <button class="btn-g" onclick="fseSubmitAll()">Save all entries</button>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:10px;background:var(--al);border-radius:6px;padding:7px 10px;color:var(--at)">
+      Set the purchase date and supplier above, then fill product rows below. Click the SN button on any row to add serial/IMEI numbers for that product.
+    </div>
+    <div class="fse-hdr">
+      <span>Product</span><span>Qty</span><span>Buy price (৳)</span><span>Sell price (৳)</span><span></span>
+    </div>
+    <div id="fse-rows"></div>
+    <div style="margin-top:10px;display:flex;gap:7px;align-items:center">
+      <button class="btn-s" onclick="fseAddRow()">+ Add another row</button>
+      <span id="fse-msg"></span>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Quick add new product inline</span></div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Product name *</label><input class="inp" id="qa-name" placeholder="e.g. Redmi Note 13"></div>
+      <div class="fg"><label class="lbl">Category</label><select class="sel" id="qa-cat"><option value="">Select...</option></select></div>
+      <div class="fg"><label class="lbl">Type</label>
+        <select class="sel" id="qa-type">
+          <option value="regular">Regular (no SN needed)</option>
+          <option value="serial">Has serial number</option>
+          <option value="mobile">Mobile phone (IMEI)</option>
+        </select>
+      </div>
+    </div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Default sell price (৳)</label><input class="inp" id="qa-sell" type="number" placeholder="0"></div>
+      <div class="fg"><label class="lbl">Low stock alert at</label><input class="inp" id="qa-alert" type="number" value="5"></div>
+      <div class="fg"><label class="lbl">New category (type to create)</label><input class="inp" id="qa-newcat" placeholder="New category name"></div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="btn" onclick="qaAddProduct()">Add product to catalog</button>
+      <span id="qa-msg"></span>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="view" id="view-products">
+  <div class="panel">
+    <div class="ph">
+      <span class="pt">Product catalog</span>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <input class="inp" id="pl-q" placeholder="Search name or ID..." style="width:140px;padding:5px 8px" oninput="renderProducts()">
+        <select class="sel" id="pl-cat" style="width:130px;padding:5px 8px" onchange="renderProducts()"><option value="">All categories</option></select>
+        <button class="btn" onclick="openProdForm(null)">+ Add product</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Product</th><th>Brand</th><th>Variant</th><th>Category</th><th>Type</th><th>Stock</th><th>WAC</th><th>Sell</th><th>Actions</th></tr></thead>
+        <tbody id="pl-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Manage categories</span></div>
+    <div style="display:flex;gap:7px;margin-bottom:8px">
+      <input class="inp" id="new-cat" placeholder="New category name" style="max-width:200px">
+      <button class="btn-s" onclick="addCat()">Add</button>
+    </div>
+    <div id="cat-tags" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+  </div>
+</div>
+
+<!-- PURCHASE / RESTOCK — with SN/IMEI -->
+<div class="view" id="view-purchase">
+  <div class="panel">
+    <div class="ph"><span class="pt">Purchase / restock stock</span><span style="font-size:11px;color:var(--ink3)">WAC recalculated on remaining stock only</span></div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Product *</label><select class="sel" id="pu-prod" onchange="onPuChange()"><option value="">Select product...</option></select></div>
+      <div class="fg"><label class="lbl">Quantity *</label><input class="inp" id="pu-qty" type="number" min="1" value="1" oninput="calcWacPrev()"></div>
+      <div class="fg"><label class="lbl">Price per unit (৳) *</label><input class="inp" id="pu-price" type="number" oninput="calcWacPrev()"></div>
+    </div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Purchase date *</label><input class="inp" id="pu-date" type="date"></div>
+      <div class="fg"><label class="lbl">Supplier</label><input class="inp" id="pu-sup" placeholder="Optional"></div>
+      <div class="fg"><label class="lbl">Invoice ref</label><input class="inp" id="pu-ref" placeholder="Optional"></div>
+    </div>
+
+    <!-- SN/IMEI section — always visible, adapts to product type -->
+    <div id="pu-sn-section" class="sn-area" style="margin-bottom:12px">
+      <div class="sn-title">
+        <span id="pu-sn-title-text">Serial / IMEI numbers (optional — only for products that need it)</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn-s" style="padding:3px 8px;font-size:11px" onclick="puSnToggleMode()">Switch to bulk paste</button>
+          <button class="btn-s" style="padding:3px 8px;font-size:11px" onclick="puSnAddRow()">+ Add row</button>
+        </div>
+      </div>
+      <div id="pu-sn-rows"></div>
+      <div id="pu-sn-bulk-wrap" style="display:none">
+        <div class="tip" style="margin-bottom:5px">Paste all serial/IMEI numbers, one per line:</div>
+        <textarea class="sn-bulk" id="pu-sn-bulk" placeholder="SN001&#10;SN002&#10;SN003&#10;..."></textarea>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--ink3)" id="pu-sn-count"></div>
+    </div>
+
+    <div id="wac-prev" class="wac-box" style="display:none">
+      <div style="font-size:11px;font-weight:600;color:var(--bt);margin-bottom:6px">WAC preview after this purchase</div>
+      <div id="wac-prev-rows"></div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center">
+      <button class="btn" onclick="recPurchase()">Record purchase</button>
+      <button class="btn-s" onclick="clearPuForm()">Clear</button>
+      <span id="pu-msg"></span>
+    </div>
+  </div>
+  <div class="panel" id="pu-hist-panel" style="display:none">
+    <div class="ph"><span class="pt" id="pu-hist-title">Purchase history</span></div>
+    <div id="pu-hist-body"></div>
+  </div>
+</div>
+
+<!-- SECOND-HAND -->
+<div class="view" id="view-secondhand">
+  <div class="panel">
+    <div class="ph"><span class="pt">Buy second-hand product</span><span style="font-size:11px;color:var(--ink3)">Full seller ID required</span></div>
+    <div class="form-section">
+      <div class="form-section-title">Seller identity</div>
+      <div class="fgrid g3">
+        <div class="fg"><label class="lbl">Full name *</label><input class="inp" id="sh-sname" placeholder="Seller full name"></div>
+        <div class="fg"><label class="lbl">Phone *</label><input class="inp" id="sh-sphone" placeholder="01XXXXXXXXX"></div>
+        <div class="fg"><label class="lbl">NID / Passport *</label><input class="inp" id="sh-sid" placeholder="NID: 1234567890"></div>
+      </div>
+      <div class="fgrid g2">
+        <div class="fg"><label class="lbl">Address</label><input class="inp" id="sh-saddr" placeholder="Full address"></div>
+        <div class="fg"><label class="lbl">Notes</label><input class="inp" id="sh-snote" placeholder="Optional"></div>
+      </div>
+      <div class="fgrid g2">
+        <div class="fg"><label class="lbl">Seller photo</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-s" onclick="document.getElementById('sh-photo').click()">Upload photo</button>
+            <input type="file" id="sh-photo" accept="image/*" style="display:none" onchange="prevPhoto(this,'sh-photo-prev')">
+            <div id="sh-photo-prev" class="seller-photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--ink3)"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+          </div>
+        </div>
+        <div class="fg"><label class="lbl">ID card photo</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-s" onclick="document.getElementById('sh-idp').click()">Upload ID photo</button>
+            <input type="file" id="sh-idp" accept="image/*" style="display:none" onchange="prevPhoto(this,'sh-idp-prev')">
+            <div id="sh-idp-prev" class="seller-photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--ink3)"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2.5"/><path d="M13 10h5M13 12h5M13 14h3"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Product details</div>
+      <div class="fgrid g3">
+        <div class="fg"><label class="lbl">Select existing product</label><select class="sel" id="sh-prod" onchange="onShProd()"><option value="">Select existing...</option></select></div>
+        <div class="fg"><label class="lbl">Or enter new product name</label><input class="inp" id="sh-newprod" placeholder="e.g. Used iPhone 12"></div>
+        <div class="fg"><label class="lbl">Category</label><select class="sel" id="sh-cat"><option value="">Select...</option></select></div>
+      </div>
+      <div class="fgrid g4">
+        <div class="fg"><label class="lbl">Condition</label><select class="sel" id="sh-cond"><option value="good">Good</option><option value="fair">Fair</option><option value="poor">Poor</option></select></div>
+        <div class="fg"><label class="lbl">Buy price (৳) *</label><input class="inp" id="sh-cost" type="number"></div>
+        <div class="fg"><label class="lbl">Sell price (৳) *</label><input class="inp" id="sh-sell" type="number"></div>
+        <div class="fg"><label class="lbl">Purchase date *</label><input class="inp" id="sh-date" type="date"></div>
+      </div>
+      <div class="fgrid g2">
+        <div class="fg"><label class="lbl">IMEI</label><input class="inp" id="sh-imei" placeholder="Optional"></div>
+        <div class="fg"><label class="lbl">Serial number</label><input class="inp" id="sh-serial" placeholder="Optional"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center"><button class="btn" onclick="recSH()">Record purchase</button><span id="sh-msg"></span></div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Second-hand purchase log</span></div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Product</th><th>Cond.</th><th>Seller</th><th>ID</th><th>Buy</th><th>Sell</th><th>Margin</th><th></th></tr></thead>
+    <tbody id="sh-tbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- RECORD SALE -->
+<div class="view" id="view-sale">
+  <div class="panel">
+    <div class="ph"><span class="pt">Record a sale</span><span style="font-size:11px;color:var(--rt);font-weight:500">Every sale must be recorded immediately</span></div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Salesperson *</label><select class="sel" id="sl-emp"><option value="">Select...</option></select></div>
+      <div class="fg"><label class="lbl">Product *</label><select class="sel" id="sl-prod" onchange="onSlChange()"><option value="">Select...</option></select></div>
+      <div class="fg"><label class="lbl">Quantity *</label><input class="inp" id="sl-qty" type="number" min="1" value="1" oninput="calcSale()"></div>
+    </div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">WAC cost/unit (৳)</label><input class="inp" id="sl-cost" readonly style="opacity:.6"></div>
+      <div class="fg"><label class="lbl">Sell price/unit (৳) *</label><input class="inp" id="sl-sell" type="number" oninput="calcSale()"></div>
+      <div class="fg"><label class="lbl">Profit</label><input class="inp" id="sl-profit" readonly style="opacity:.6;color:var(--gt);font-weight:600"></div>
+    </div>
+    <div id="sl-sn-row" style="display:none" class="fgrid g2">
+      <div class="fg"><label class="lbl">IMEI (mobile)</label><input class="inp" id="sl-imei" placeholder="Enter IMEI"></div>
+      <div class="fg"><label class="lbl">Serial number</label><input class="inp" id="sl-serial" placeholder="Enter serial no."></div>
+    </div>
+    <div class="fgrid g2">
+      <div class="fg"><label class="lbl">Customer</label><input class="inp" id="sl-cust" placeholder="Walk-in"></div>
+      <div class="fg"><label class="lbl">Date</label><input class="inp" id="sl-date" type="date"></div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center"><button class="btn" onclick="recSale()">Record sale</button><button class="btn-s" onclick="clearSale()">Clear</button><span id="sl-msg"></span></div>
+  </div>
+  <div class="panel"><div class="ph"><span class="pt">Sales log</span></div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Date</th><th>Employee</th><th>Product / IMEI</th><th>Qty</th><th>Sale</th><th>Profit</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody id="sl-tbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- RETURN -->
+<div class="view" id="view-return">
+  <div class="panel">
+    <div class="ph"><span class="pt">Process sales return</span><span style="font-size:11px;color:var(--ink3)">Stock restored, WAC recalculated, profit reversed</span></div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Original sale *</label><select class="sel" id="rt-sale"><option value="">Select sale...</option></select></div>
+      <div class="fg"><label class="lbl">Return qty *</label><input class="inp" id="rt-qty" type="number" min="1" value="1"></div>
+      <div class="fg"><label class="lbl">Reason</label><select class="sel" id="rt-reason"><option value="defective">Defective</option><option value="wrong">Wrong product</option><option value="changed_mind">Changed mind</option><option value="other">Other</option></select></div>
+    </div>
+    <div class="fg" style="margin-bottom:11px"><label class="lbl">Notes</label><input class="inp" id="rt-note"></div>
+    <div style="display:flex;gap:7px;align-items:center"><button class="btn-r" onclick="recReturn()">Process return</button><span id="rt-msg"></span></div>
+  </div>
+  <div class="panel"><div class="ph"><span class="pt">Returns log</span></div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Date</th><th>Product</th><th>Qty</th><th>Reason</th><th>Refund</th><th>Action</th></tr></thead>
+      <tbody id="rt-tbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- EXPENSES -->
+<div class="view" id="view-expenses">
+  <div class="panel">
+    <div class="ph"><span class="pt">Add expense</span></div>
+    <div class="fgrid g4">
+      <div class="fg"><label class="lbl">Category *</label><select class="sel" id="ex-cat"><option value="">Select...</option></select></div>
+      <div class="fg"><label class="lbl">Amount (৳) *</label><input class="inp" id="ex-amt" type="number"></div>
+      <div class="fg"><label class="lbl">Date *</label><input class="inp" id="ex-date" type="date"></div>
+      <div class="fg"><label class="lbl">Description</label><input class="inp" id="ex-desc"></div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center;margin-bottom:9px"><button class="btn" onclick="addExp()">Add</button><span id="ex-msg"></span></div>
+    <div style="display:flex;gap:7px;padding-top:9px;border-top:1px solid var(--b);align-items:center">
+      <input class="inp" id="new-ex-cat" placeholder="New category name" style="max-width:190px">
+      <button class="btn-s" onclick="addExCat()">Add category</button>
+      <div id="ex-cat-tags" style="display:flex;gap:5px;flex-wrap:wrap;flex:1"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Expense log</span>
+      <div style="display:flex;gap:6px">
+        <select class="sel" id="ex-f-cat" style="width:130px;padding:5px 7px" onchange="renderExp()"><option value="">All categories</option></select>
+        <select class="sel" id="ex-f-mon" style="width:115px;padding:5px 7px" onchange="renderExp()"><option value="">All months</option></select>
+      </div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody id="ex-tbody"></tbody></table></div>
+    <div id="ex-total-row" style="display:none;text-align:right;padding:7px 0 0;font-size:12px;font-weight:600;border-top:1px solid var(--b2);margin-top:4px">Total: <span class="mono" id="ex-total"></span></div>
+  </div>
+</div>
+
+<!-- P&L -->
+<div class="view" id="view-pl">
+  <div class="mg">
+    <div class="mc"><div class="ml">Revenue</div><div class="mv" id="pl-rev">৳0</div><div class="ms mu">all sales</div></div>
+    <div class="mc"><div class="ml">COGS (WAC)</div><div class="mv" id="pl-cogs">৳0</div><div class="ms mu">cost of goods</div></div>
+    <div class="mc"><div class="ml">Expenses</div><div class="mv" id="pl-exp">৳0</div><div class="ms mu">all categories</div></div>
+    <div class="mc"><div class="ml">Net profit</div><div class="mv" id="pl-net">৳0</div><div class="ms up" id="pl-mgn">0%</div></div>
+  </div>
+  <div class="r2">
+    <div class="panel"><div class="ph"><span class="pt">P&amp;L breakdown</span><button class="plink" onclick="askAI('Give me 3 specific ways to improve my net profit margin.')">Ask AI ↗</button></div><div id="pl-detail"></div></div>
+    <div class="panel"><div class="ph"><span class="pt">Second-hand summary</span></div><div id="pl-sh"></div></div>
+  </div>
+</div>
+
+<!-- EMPLOYEES -->
+<div class="view" id="view-employees">
+  <div class="panel">
+    <div class="ph"><span class="pt">Add employee</span></div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Full name *</label><input class="inp" id="em-name" placeholder="Name"></div>
+      <div class="fg"><label class="lbl">Role</label><input class="inp" id="em-role" placeholder="Salesperson"></div>
+      <div class="fg"><label class="lbl">Base salary (৳/month)</label><input class="inp" id="em-sal" type="number" placeholder="0"></div>
+    </div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Phone</label><input class="inp" id="em-phone" placeholder="01XXXXXXXXX"></div>
+      <div class="fg"><label class="lbl">Join date</label><input class="inp" id="em-join" type="date"></div>
+      <div class="fg"><label class="lbl">Commission %</label><input class="inp" id="em-comm" type="number" value="0"></div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center"><button class="btn" onclick="addEmp()">Add employee</button><span id="em-msg"></span></div>
+  </div>
+  <div class="panel"><div class="ph"><span class="pt">Employee roster</span></div><div id="em-list"></div></div>
+</div>
+
+<!-- BACKUP & EXPORT -->
+<div class="view" id="view-backup">
+  <div class="mg3">
+    <div class="bk-card">
+      <div class="bk-icon" style="background:var(--bl)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a4fa0" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">Local disk backup</div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:11px;line-height:1.5">Download complete data as JSON. Open in browser to restore.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-g" onclick="backupJSON()">Download .json backup</button>
+        <label style="cursor:pointer"><input type="file" accept=".json" onchange="restoreJSON(this)" style="display:none"><span class="btn-a" style="display:inline-flex;padding:7px 12px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer">Restore from file</span></label>
+      </div>
+    </div>
+    <div class="bk-card">
+      <div class="bk-icon" style="background:var(--gl)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a7a4a" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">Gmail backup</div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:11px;line-height:1.5">Opens Gmail to email backup to yourself. Also downloads the file.</div>
+      <button class="btn-g" onclick="backupGmail()">Email to Gmail</button>
+    </div>
+    <div class="bk-card">
+      <div class="bk-icon" style="background:var(--pul)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">Auto-backup every 30 min</div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:9px;line-height:1.5">Auto-downloads to your PC every 30 minutes while the app is open.</div>
+      <div class="toggle-row" onclick="toggleAutoBackup()">
+        <div class="toggle" id="auto-backup-toggle"></div>
+        <span id="auto-backup-label">Enable auto-backup</span>
+      </div>
+      <div style="font-size:11px;color:var(--ink3);margin-top:8px" id="next-backup-time"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Export individual CSVs</span></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn-g" onclick="exportCSV('sales')">Sales CSV</button>
+      <button class="btn-g" onclick="exportCSV('purchases')">Purchases CSV</button>
+      <button class="btn-g" onclick="exportCSV('expenses')">Expenses CSV</button>
+      <button class="btn-g" onclick="exportCSV('secondhand')">Second-hand CSV</button>
+      <button class="btn-g" onclick="exportCSV('pl')">P&L monthly CSV</button>
+      <button class="btn-g" onclick="exportCSV('returns')">Returns CSV</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Backup log</span></div>
+    <div id="backup-log" style="font-size:12px;color:var(--ink3)">No backups taken yet.</div>
+  </div>
+</div>
+
+<!-- AI AGENT -->
+<div class="view" id="view-ai">
+  <div class="chat-wrap">
+    <div class="ch-hdr"><div class="cdot"></div><span style="font-size:13px;font-weight:600;flex:1">Shop AI Agent</span><span style="font-size:11px;color:var(--ink3);font-family:var(--mono)" id="ai-api-key-label">API key: set in settings</span></div>
+    <div class="msgs" id="chat-msgs">
+      <div class="msg"><div class="mav aav">AI</div><div class="bbl abbl">Hello! I am your shop AI agent. I can analyze sales trends, inventory, employee performance, second-hand margins, profit &amp; loss, and flag suspicious patterns. What would you like to know?<br><br><strong>Note:</strong> Enter your Anthropic API key below to enable AI responses.</div></div>
+    </div>
+    <div class="qcs">
+      <div class="qc" onclick="askAI('Which products are trending up this week and which are worst sellers? What should I do?')">Trending vs worst</div>
+      <div class="qc" onclick="askAI('Who is my best employee based on profit contribution? Compare all.')">Best employee</div>
+      <div class="qc" onclick="askAI('Which products need restocking urgently?')">Restock alerts</div>
+      <div class="qc" onclick="askAI('Is any employee selling without recording? Check for theft risk based on sales counts.')">Theft detection</div>
+      <div class="qc" onclick="askAI('Give me a complete profit and loss analysis with 3 recommendations.')">Full P&L advice</div>
+      <div class="qc" onclick="askAI('Analyze my second-hand purchases. Are they profitable?')">Second-hand analysis</div>
+    </div>
+    <div style="padding:7px 12px;border-top:1px solid var(--b);background:var(--s2);flex-shrink:0">
+      <div style="display:flex;gap:7px;align-items:center">
+        <span style="font-size:11px;color:var(--ink3);flex-shrink:0">Anthropic API key:</span>
+        <input class="inp" id="ai-key" type="password" placeholder="sk-ant-..." style="flex:1;font-family:var(--mono)" oninput="saveApiKey()">
+        <span style="font-size:10px;color:var(--ink3)">Stored locally</span>
+      </div>
+    </div>
+    <div class="ci-row">
+      <textarea class="ci" id="chat-in" rows="1" placeholder="Ask anything about your shop..." onkeydown="hkAI(event)"></textarea>
+      <button class="sbtn" onclick="sendAI()"><svg viewBox="0 0 20 20"><path d="M2 10L18 2 10 18 9 11z"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- BRANDS & VARIANTS -->
+<div class="view" id="view-brands">
+  <div class="mg">
+    <div class="mc"><div class="ml">Total brands</div><div class="mv" id="bv-total-brands">0</div><div class="ms mu">across all categories</div></div>
+    <div class="mc"><div class="ml">Total variants</div><div class="mv" id="bv-total-variants">0</div><div class="ms mu">RAM/Storage options</div></div>
+    <div class="mc"><div class="ml">Branded products</div><div class="mv" id="bv-branded-prods">0</div><div class="ms mu">in catalog</div></div>
+    <div class="mc"><div class="ml">Custom brands</div><div class="mv" id="bv-custom">0</div><div class="ms mu">added by you</div></div>
+  </div>
+  <div class="r2">
+    <div class="panel">
+      <div class="ph"><span class="pt">Phone brands</span><button class="plink" onclick="bvAddBrand('phone')">+ Add brand</button></div>
+      <div id="bv-phone-brands" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><span class="pt">Accessory &amp; other brands</span><button class="plink" onclick="bvAddBrand('acc')">+ Add brand</button></div>
+      <div id="bv-acc-brands" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+    </div>
+  </div>
+  <div class="r2">
+    <div class="panel">
+      <div class="ph"><span class="pt">RAM / Storage variants</span><button class="plink" onclick="bvAddVariant()">+ Add variant</button></div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Click a variant to select / deselect. Used when adding products that have RAM &amp; storage options.</div>
+      <div id="bv-variants" style="display:flex;flex-wrap:wrap"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><span class="pt">Router &amp; networking brands</span><button class="plink" onclick="bvAddBrand('router')">+ Add brand</button></div>
+      <div id="bv-router-brands" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><span class="pt">Products by brand</span>
+      <select class="sel" id="bv-filter-brand" style="width:160px;padding:5px 8px" onchange="renderBrandProducts()"><option value="">All brands</option></select>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl"><thead><tr><th>Product</th><th>Brand</th><th>Variant</th><th>Category</th><th>Stock</th><th>WAC</th><th>Sell</th></tr></thead>
+      <tbody id="bv-prod-tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+</div><!-- end content -->
+</div><!-- end main -->
+</div><!-- end app -->
+
+<!-- PRODUCT FORM MODAL -->
+<div class="modal-overlay" id="prod-modal">
+  <div class="modal">
+    <div class="modal-title" id="prod-modal-title">Add product</div>
+    <div class="fgrid g2">
+      <div class="fg"><label class="lbl">Product name *</label><input class="inp" id="pf-name" placeholder="e.g. Nokia 105"></div>
+      <div class="fg"><label class="lbl">Category *</label><select class="sel" id="pf-cat"><option value="">Select...</option></select></div>
+    </div>
+    <div class="fgrid g2">
+      <div class="fg"><label class="lbl">Brand</label>
+        <select class="sel" id="pf-brand"><option value="">No brand / generic</option></select>
+      </div>
+      <div class="fg"><label class="lbl">Variant (RAM/Storage)</label>
+        <select class="sel" id="pf-variant"><option value="">No variant</option></select>
+      </div>
+    </div>
+    <div class="fgrid g2">
+      <div class="fg"><label class="lbl">New category (type to create)</label><input class="inp" id="pf-newcat" placeholder="Or type new category"></div>
+      <div class="fg"><label class="lbl">Product type</label>
+        <select class="sel" id="pf-type">
+          <option value="regular">Regular (no SN needed)</option>
+          <option value="serial">Has serial number</option>
+          <option value="mobile">Mobile phone (IMEI)</option>
+        </select>
+      </div>
+    </div>
+    <div class="fgrid g3">
+      <div class="fg"><label class="lbl">Default sell price (৳)</label><input class="inp" id="pf-sell" type="number" placeholder="0"></div>
+      <div class="fg"><label class="lbl">Low stock alert</label><input class="inp" id="pf-alert" type="number" value="5"></div>
+      <div class="fg"></div>
+    </div>
+    <div id="pf-opening-section">
+      <div class="fgrid g3">
+        <div class="fg"><label class="lbl">Opening stock qty</label><input class="inp" id="pf-qty" type="number" value="0"></div>
+        <div class="fg"><label class="lbl">Purchase price (৳)</label><input class="inp" id="pf-cost" type="number" placeholder="0"></div>
+        <div class="fg"><label class="lbl">Purchase date</label><input class="inp" id="pf-date" type="date"></div>
+      </div>
+    </div>
+    <input type="hidden" id="pf-editing-id">
+    <div style="display:flex;gap:7px;align-items:center;margin-top:4px">
+      <button class="btn" onclick="saveProd()">Save product</button>
+      <button class="btn-s" onclick="closeProdModal()">Cancel</button>
+      <span id="pf-msg"></span>
+    </div>
+  </div>
+</div>
+
+<!-- SELLER DETAIL MODAL -->
+<div class="modal-overlay" id="seller-modal">
+  <div class="modal">
+    <div class="modal-title">Seller identity record</div>
+    <div id="seller-modal-body"></div>
+    <div style="margin-top:12px;text-align:right"><button class="btn-s" onclick="document.getElementById('seller-modal').classList.remove('open')">Close</button></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATABASE
+// ═══════════════════════════════════════════
+const DB = {
+  products: [], purchases: [], sales: [], returns: [],
+  expenses: [], employees: [], secondhand: [],
+  cats: ['Mobile Phone','Feature Phone','Tablet','Laptop','Router','Accessories','Cables','Storage','Printer','UPS','Computer','Other'],
+  exCats: ['Salary','Rent','Electricity','Internet','Marketing','Transport','Stationery','Maintenance','Other'],
+  settings: { autoBackup: false, apiKey: '' },
+  brands: {
+    phone: [
+      {name:'Apple',     color:'#1d1d1f', bg:'#f5f5f7', custom:false},
+      {name:'Samsung',   color:'#1428a0', bg:'#e8ebfd', custom:false},
+      {name:'Xiaomi',    color:'#ff6900', bg:'#fff0e6', custom:false},
+      {name:'Realme',    color:'#f5a623', bg:'#fff8e8', custom:false},
+      {name:'Oppo',      color:'#1b8547', bg:'#e8f7ee', custom:false},
+      {name:'Vivo',      color:'#415fff', bg:'#ecefff', custom:false},
+      {name:'OnePlus',   color:'#eb0029', bg:'#fde8eb', custom:false},
+      {name:'Nokia',     color:'#005aff', bg:'#e6eeff', custom:false},
+      {name:'Symphony',  color:'#7b2d8b', bg:'#f5e8f7', custom:false},
+      {name:'Itel',      color:'#e63500', bg:'#fdeee8', custom:false},
+      {name:'Tecno',     color:'#0088cc', bg:'#e6f4fb', custom:false},
+      {name:'Walton',    color:'#c41e3a', bg:'#fde8ec', custom:false},
+      {name:'Infinix',   color:'#d40000', bg:'#fde8e8', custom:false},
+      {name:'Huawei',    color:'#cf0a2c', bg:'#fde8ed', custom:false},
+      {name:'Honor',     color:'#4d3bff', bg:'#eeedff', custom:false},
+      {name:'Motorola',  color:'#e1000f', bg:'#fde8e9', custom:false},
+      {name:'Sony',      color:'#1a1a2e', bg:'#eeeef5', custom:false},
+      {name:'Lava',      color:'#e55a22', bg:'#fef0ea', custom:false},
+      {name:'Gionee',    color:'#0071bc', bg:'#e6f2fb', custom:false},
+      {name:'Micromax',  color:'#e51c23', bg:'#fde9ea', custom:false},
+    ],
+    acc: [
+      {name:'Anker',     color:'#2e7bd6', bg:'#e8f2fd', custom:false},
+      {name:'Baseus',    color:'#007aff', bg:'#e6f2ff', custom:false},
+      {name:'JBL',       color:'#f5a623', bg:'#fff8e8', custom:false},
+      {name:'Sony',      color:'#1a1a2e', bg:'#eeeef5', custom:false},
+      {name:'Boat',      color:'#00c2e0', bg:'#e6fafd', custom:false},
+      {name:'Remax',     color:'#e63500', bg:'#fdeee8', custom:false},
+      {name:'WK Design', color:'#333',    bg:'#f2f2f2', custom:false},
+      {name:'Hoco',      color:'#0077b6', bg:'#e6f2f9', custom:false},
+      {name:'Ugreen',    color:'#2e8b57', bg:'#e8f5ee', custom:false},
+      {name:'Havit',     color:'#d62828', bg:'#fde8e8', custom:false},
+      {name:'TP-Link',   color:'#007b46', bg:'#e6f5ed', custom:false},
+      {name:'Xiaomi',    color:'#ff6900', bg:'#fff0e6', custom:false},
+    ],
+    router: [
+      {name:'TP-Link',   color:'#007b46', bg:'#e6f5ed', custom:false},
+      {name:'Tenda',     color:'#0057a8', bg:'#e6eefa', custom:false},
+      {name:'D-Link',    color:'#e2001a', bg:'#fde8eb', custom:false},
+      {name:'Netgear',   color:'#ef7d00', bg:'#fef4e6', custom:false},
+      {name:'Asus',      color:'#009fe3', bg:'#e6f6fc', custom:false},
+      {name:'Huawei',    color:'#cf0a2c', bg:'#fde8ed', custom:false},
+      {name:'Xiaomi',    color:'#ff6900', bg:'#fff0e6', custom:false},
+      {name:'Mikrotik',  color:'#961c20', bg:'#f9e8e9', custom:false},
+      {name:'Ubiquiti',  color:'#0559c9', bg:'#e6effe', custom:false},
+      {name:'ZTE',       color:'#00adef', bg:'#e6f7fe', custom:false},
+      {name:'Mercusys',  color:'#5ba829', bg:'#edf7e6', custom:false},
+      {name:'Comfast',   color:'#e84c1a', bg:'#fdeee8', custom:false},
+    ]
+  },
+  variants: [
+    '1/8','1/16','2/16','2/32','3/32','3/64',
+    '4/32','4/64','4/128','6/64','6/128','6/256',
+    '8/128','8/256','8/512','12/256','12/512',
+    '16/256','16/512','16/1TB','32/1TB',
+    '64GB','128GB','256GB','512GB','1TB',
+    '2GB RAM','4GB RAM','8GB RAM','16GB RAM','32GB RAM'
+  ]
+};
+
+// ═══ HELPERS ═══
+const fmt = v => '৳' + (Math.round(v)||0).toLocaleString('en-BD');
+const fmtD = d => { try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); } catch(e) { return d||'—'; }};
+const today = () => new Date().toISOString().split('T')[0];
+const ECC = [['#dbeafe','#1a4fa0'],['#d1fae5','#065f46'],['#fef3c7','#92400e'],['#fce7f3','#9d174d'],['#ede9fe','#5b21b6'],['#fee2e2','#991b1b'],['#ecfdf5','#065f46'],['#fff7ed','#9a3412']];
+function showMsg(id, m, t) { const el = document.getElementById(id); if(!el) return; el.textContent = m; el.className = t==='ok'?'msg-ok':'msg-err'; setTimeout(()=>el.textContent='', 4000); }
+
+// ═══ WAC ENGINE (correct — on remaining stock only) ═══
+function computeWAC(pid) {
+  const p = DB.products.find(x => x.id === pid);
+  if (!p) return { wac: 0, stock: 0, log: [] };
+  const evs = [];
+  if ((p.openingQty||0) > 0) evs.push({ type:'buy', date: p.openingDate||'2020-01-01', qty: p.openingQty, price: p.openingCost||0, label:'Opening stock' });
+  DB.purchases.filter(x => x.pid===pid).forEach(x => evs.push({ type:'buy', date: x.date, qty: x.qty, price: x.price, label: x.sup||'Purchase' }));
+  DB.secondhand.filter(s => s.pid===pid).forEach(s => evs.push({ type:'buy', date: s.date, qty: 1, price: s.cost, label:'Second-hand' }));
+  DB.sales.filter(s => s.pid===pid && s.status!=='returned').forEach(s => evs.push({ type:'sell', date: s.date.substring(0,10), qty: s.qty, label: s.emp }));
+  DB.returns.filter(r => r.pid===pid).forEach(r => evs.push({ type:'buy', date: r.date.substring(0,10), qty: r.qty, price: r.wacAtSale||0, label:'Return' }));
+  evs.sort((a,b) => a.date!==b.date ? a.date.localeCompare(b.date) : (a.type==='buy'?-1:1));
+  let rs=0, rc=0;
+  const log = [];
+  evs.forEach(ev => {
+    if (ev.type==='buy') { rc += ev.price*ev.qty; rs += ev.qty; }
+    else { const w = rs>0?rc/rs:0; rc -= w*ev.qty; rs = Math.max(0, rs-ev.qty); if(rs===0)rc=0; }
+    log.push({ ...ev, stockAfter: rs, wacAfter: rs>0 ? Math.round(rc/rs) : 0 });
+  });
+  return { wac: rs>0?Math.round(rc/rs):0, stock: Math.max(0,rs), log };
+}
+
+// ═══ NAVIGATION ═══
+const PAGE_TITLES = { dash:'Dashboard', analytics:'Analytics', 'fast-stock':'Fast Stock Entry', sale:'Record Sale', return:'Sales Return', ai:'AI Agent', products:'Products', purchase:'Purchase / Restock', secondhand:'Buy Second-hand', expenses:'Expenses', pl:'Profit & Loss', employees:'Employees', brands:'Brands & Variants', backup:'Backup & Export' };
+function sv(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-'+id);
+  if (view) view.classList.add('active');
+  const ni = document.querySelector(`.ni[data-view="${id}"]`);
+  if (ni) ni.classList.add('active');
+  document.getElementById('pg-title').textContent = PAGE_TITLES[id]||id;
+  if (id==='ai') { loadApiKey(); setTimeout(()=>document.getElementById('chat-in').focus(),60); }
+  if (id==='analytics') renderAnalytics();
+  if (id==='pl') renderPL();
+  if (id==='products') renderProducts();
+  if (id==='dash') renderDash();
+  if (id==='expenses') renderExp();
+  if (id==='employees') renderEmps();
+  if (id==='brands') renderBrandsView();
+  if (id==='sale'||id==='return') refreshAllSelects();
+  if (id==='fast-stock') renderFseRows();
+  if (id==='purchase') { refreshProdSelect('pu-prod'); puSnAddRow(); }
+}
+document.querySelectorAll('.ni').forEach(ni => ni.addEventListener('click', () => sv(ni.dataset.view)));
+
+// ═══ SELECTS ═══
+function refreshCatSelects() {
+  ['pf-cat','qa-cat','sh-cat','pl-cat'].forEach(id => {
+    const s = document.getElementById(id); if(!s)return;
+    const c = s.value;
+    s.innerHTML = (id==='pl-cat'?'<option value="">All categories</option>':'<option value="">Select...</option>') + DB.cats.map(x=>`<option value="${x}">${x}</option>`).join('');
+    s.value = c;
+  });
+  document.getElementById('cat-tags').innerHTML = DB.cats.map(c=>`<span class="tag tg-b">${c}</span>`).join(' ');
+}
+function refreshExCatSelect() {
+  ['ex-cat','ex-f-cat'].forEach(id => {
+    const s = document.getElementById(id); if(!s)return;
+    const c = s.value;
+    s.innerHTML = (id==='ex-f-cat'?'<option value="">All categories</option>':'<option value="">Select...</option>') + DB.exCats.map(x=>`<option value="${x}">${x}</option>`).join('');
+    s.value = c;
+  });
+  document.getElementById('ex-cat-tags').innerHTML = DB.exCats.map(c=>`<span class="tag tg-m">${c}</span>`).join(' ');
+}
+function refreshProdSelect(id) {
+  const s = document.getElementById(id); if(!s)return;
+  const c = s.value;
+  const base = id==='sh-prod' ? '<option value="">Select existing...</option>' : '<option value="">Select product...</option>';
+  s.innerHTML = base + DB.products.map(p => { const{stock}=computeWAC(p.id); return `<option value="${p.id}">${p.name} (${stock} in stock)</option>`; }).join('');
+  s.value = c;
+}
+function refreshEmpSelect() {
+  const s = document.getElementById('sl-emp'); if(!s)return;
+  const c = s.value;
+  s.innerHTML = '<option value="">Select...</option>' + DB.employees.map(e=>`<option value="${e.name}">${e.name}</option>`).join('');
+  s.value = c;
+}
+function refreshAllSelects() {
+  ['pu-prod','sl-prod','sh-prod'].forEach(id => refreshProdSelect(id));
+  refreshEmpSelect();
+  const rt = document.getElementById('rt-sale');
+  if(rt) { rt.innerHTML = '<option value="">Select sale...</option>' + DB.sales.filter(s=>s.status==='active').map(s=>`<option value="${s.id}">#${s.id} ${fmtD(s.date)} — ${s.prodName} x${s.qty} (${s.emp})</option>`).join(''); }
+}
+function addCat() { const v=document.getElementById('new-cat').value.trim(); if(!v||DB.cats.includes(v))return; DB.cats.push(v); document.getElementById('new-cat').value=''; refreshCatSelects(); renderFseRows(); }
+function addExCat() { const v=document.getElementById('new-ex-cat').value.trim(); if(!v||DB.exCats.includes(v))return; DB.exCats.push(v); document.getElementById('new-ex-cat').value=''; refreshExCatSelect(); }
+
+// ═══ PRODUCT FORM MODAL ═══
+function openProdForm(pid) {
+  const modal = document.getElementById('prod-modal');
+  document.getElementById('pf-editing-id').value = pid||'';
+  document.getElementById('prod-modal-title').textContent = pid ? 'Edit product' : 'Add product';
+  document.getElementById('pf-opening-section').style.display = pid ? 'none' : 'block';
+  // Populate brand select
+  const allBrands = [...DB.brands.phone,...DB.brands.acc,...DB.brands.router];
+  const uniqueBrands = [...new Map(allBrands.map(b=>[b.name,b])).values()].sort((a,b)=>a.name.localeCompare(b.name));
+  const bsel = document.getElementById('pf-brand');
+  bsel.innerHTML = '<option value="">No brand / generic</option>' + uniqueBrands.map(b=>`<option value="${b.name}">${b.name}</option>`).join('');
+  // Populate variant select
+  const vsel = document.getElementById('pf-variant');
+  vsel.innerHTML = '<option value="">No variant</option>' + DB.variants.map(v=>`<option value="${v}">${v}</option>`).join('');
+  if (pid) {
+    const p = DB.products.find(x=>x.id===pid);
+    document.getElementById('pf-name').value=p.name; document.getElementById('pf-cat').value=p.cat;
+    document.getElementById('pf-type').value=p.type; document.getElementById('pf-sell').value=p.sell;
+    document.getElementById('pf-alert').value=p.alert; document.getElementById('pf-newcat').value='';
+    bsel.value = p.brand||''; vsel.value = p.variant||'';
+  } else {
+    ['pf-name','pf-sell','pf-newcat'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('pf-qty').value=0; document.getElementById('pf-cost').value='';
+    document.getElementById('pf-alert').value=5; document.getElementById('pf-type').value='regular';
+    document.getElementById('pf-date').value=today();
+    bsel.value=''; vsel.value='';
+  }
+  modal.classList.add('open');
+}
+function closeProdModal() { document.getElementById('prod-modal').classList.remove('open'); }
+function saveProd() {
+  const pid = document.getElementById('pf-editing-id').value;
+  const name = document.getElementById('pf-name').value.trim();
+  const catSel = document.getElementById('pf-cat').value;
+  const catNew = document.getElementById('pf-newcat').value.trim();
+  const cat = catNew||catSel;
+  const type = document.getElementById('pf-type').value;
+  const sell = parseFloat(document.getElementById('pf-sell').value)||0;
+  const alert = parseInt(document.getElementById('pf-alert').value)||5;
+  const brand = document.getElementById('pf-brand').value||'';
+  const variant = document.getElementById('pf-variant').value||'';
+  if (!name) { showMsg('pf-msg','Name required','err'); return; }
+  if (!cat) { showMsg('pf-msg','Category required','err'); return; }
+  if (catNew && !DB.cats.includes(catNew)) DB.cats.push(catNew);
+  if (pid) {
+    const p = DB.products.find(x=>x.id===pid);
+    p.name=name; p.cat=cat; p.type=type; p.sell=sell; p.alert=alert; p.brand=brand; p.variant=variant;
+  } else {
+    const qty = parseInt(document.getElementById('pf-qty').value)||0;
+    const cost = parseFloat(document.getElementById('pf-cost').value)||0;
+    const date = document.getElementById('pf-date').value||today();
+    const id = 'P'+(DB.products.length+1).toString().padStart(3,'0');
+    DB.products.push({ id, name, cat, type, sell, alert, brand, variant, openingQty:qty, openingCost:cost, openingDate:date, serials:[], imeis:[] });
+  }
+  refreshCatSelects(); refreshAllSelects(); renderProducts(); updateAlerts(); renderFseRows();
+  closeProdModal();
+}
+function deleteProd(pid) {
+  if(!confirm('Delete this product? All purchase history for this product will also be removed.')) return;
+  DB.products = DB.products.filter(p=>p.id!==pid);
+  DB.purchases = DB.purchases.filter(p=>p.pid!==pid);
+  refreshAllSelects(); renderProducts(); updateAlerts(); renderDash();
+}
+function renderProducts() {
+  const q = (document.getElementById('pl-q')?.value||'').toLowerCase();
+  const cf = document.getElementById('pl-cat')?.value||'';
+  let prods = DB.products;
+  if(q) prods=prods.filter(p=>p.name.toLowerCase().includes(q)||p.id.toLowerCase().includes(q)||(p.brand||'').toLowerCase().includes(q));
+  if(cf) prods=prods.filter(p=>p.cat===cf);
+  const tbody = document.getElementById('pl-tbody');
+  if(!prods.length){tbody.innerHTML='<tr><td colspan="9" class="nr">No products — click "+ Add product"</td></tr>';return;}
+  const allBrands=[...DB.brands.phone,...DB.brands.acc,...DB.brands.router];
+  tbody.innerHTML = prods.map(p=>{
+    const{wac,stock}=computeWAC(p.id);
+    const margin=p.sell>0?Math.round((p.sell-wac)/p.sell*100):0;
+    const scls=stock<=p.alert?(stock===0?'dn':'wn'):'up';
+    const typeBadge={mobile:'<span class="tag tg-a">IMEI</span>',serial:'<span class="tag tg-b">Serial</span>',regular:'<span class="tag tg-m">Regular</span>'}[p.type]||'';
+    const sns=[...(p.serials||[]),...(p.imeis||[])];
+    const bInfo=allBrands.find(b=>b.name===p.brand);
+    const brandBadge=p.brand?`<span style="background:${bInfo?.bg||'var(--s3)'};color:${bInfo?.color||'var(--ink2)'};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600">${p.brand}</span>`:'<span style="font-size:10px;color:var(--ink3)">—</span>';
+    const variantBadge=p.variant?`<span style="background:var(--pul);color:var(--put);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;font-family:var(--mono)">${p.variant}</span>`:'<span style="font-size:10px;color:var(--ink3)">—</span>';
+    return `<tr>
+      <td><strong style="font-size:12px">${p.name}</strong><br><span style="font-size:10px;color:var(--ink3)">${p.id}${sns.length?' · '+sns.length+' SN/IMEI':''}</span></td>
+      <td>${brandBadge}</td><td>${variantBadge}</td>
+      <td><span class="tag tg-m">${p.cat}</span></td><td>${typeBadge}</td>
+      <td class="mono ${scls}" style="font-weight:600">${stock}${stock<=p.alert?' ⚠':''}</td>
+      <td class="mono" style="color:var(--bt);font-weight:600">${fmt(wac)}</td>
+      <td class="mono">${fmt(p.sell)}</td>
+      <td style="white-space:nowrap"><button class="btn-s" style="padding:3px 7px;font-size:11px" onclick="openProdForm('${p.id}')">Edit</button> <button class="btn-r" style="padding:3px 7px;font-size:11px" onclick="deleteProd('${p.id}')">Del</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══ FAST STOCK ENTRY ═══
+let fseRowCount = 0;
+function renderFseRows() {
+  if(document.getElementById('fse-rows').children.length===0) fseAddRow();
+}
+function fseAddRow() {
+  const container = document.getElementById('fse-rows');
+  const id = ++fseRowCount;
+  const prodOpts = '<option value="">Select product...</option>' + DB.products.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  const div = document.createElement('div');
+  div.id = 'fse-row-'+id;
+  div.innerHTML = `<div class="fse-row">
+    <div>
+      <select class="sel" id="fse-p-${id}" onchange="fseProdChange(${id})" style="width:100%;margin-bottom:3px">${prodOpts}</select>
+      <button class="fse-sn-toggle" id="fse-sn-btn-${id}" onclick="fseToggleSN(${id})" style="display:none">+ Add SN/IMEI for this product</button>
+    </div>
+    <input class="inp" id="fse-q-${id}" type="number" min="1" value="1" placeholder="Qty" oninput="fseUpdateCount(${id})">
+    <input class="inp" id="fse-bp-${id}" type="number" placeholder="Buy ৳">
+    <input class="inp" id="fse-sp-${id}" type="number" placeholder="Sell ৳">
+    <button class="btn-r" style="padding:5px 8px;font-size:12px" onclick="fseDelRow(${id})">✕</button>
+  </div>
+  <div id="fse-sn-wrap-${id}" class="fse-sn-wrap" style="display:none">
+    <div style="font-size:11px;color:var(--bt);margin-bottom:5px">Serial / IMEI numbers for this product (one per line or comma separated):</div>
+    <textarea class="sn-bulk" id="fse-sn-${id}" rows="3" placeholder="Enter serial or IMEI numbers..."></textarea>
+    <div style="font-size:10px;color:var(--ink3);margin-top:3px" id="fse-sn-count-${id}"></div>
+  </div>`;
+  container.appendChild(div);
+}
+function fseProdChange(id) {
+  const pid = document.getElementById('fse-p-'+id)?.value;
+  const p = DB.products.find(x=>x.id===pid);
+  const btn = document.getElementById('fse-sn-btn-'+id);
+  if(btn) btn.style.display = (p && p.type!=='regular') ? 'block' : 'none';
+  if(p && p.sell) document.getElementById('fse-sp-'+id).value = p.sell;
+}
+function fseToggleSN(id) {
+  const wrap = document.getElementById('fse-sn-wrap-'+id);
+  if(wrap) wrap.style.display = wrap.style.display==='none'?'block':'none';
+}
+function fseUpdateCount(id) {
+  const snArea = document.getElementById('fse-sn-wrap-'+id);
+  const qty = parseInt(document.getElementById('fse-q-'+id)?.value)||0;
+  const countEl = document.getElementById('fse-sn-count-'+id);
+  if(countEl) countEl.textContent = qty>0?`You entered ${qty} units. Add up to ${qty} serial/IMEI numbers above.`:'';
+}
+function fseDelRow(id) { const el = document.getElementById('fse-row-'+id); if(el) el.remove(); }
+function fseSubmitAll() {
+  const date = document.getElementById('fse-date').value||today();
+  const sup = document.getElementById('fse-sup').value.trim();
+  let saved=0, errors=[];
+  document.querySelectorAll('[id^="fse-p-"]').forEach(sel => {
+    const rowId = sel.id.split('-')[2];
+    const pid = sel.value;
+    if(!pid) return;
+    const qty = parseInt(document.getElementById('fse-q-'+rowId)?.value)||0;
+    const bp = parseFloat(document.getElementById('fse-bp-'+rowId)?.value)||0;
+    const sp = parseFloat(document.getElementById('fse-sp-'+rowId)?.value)||0;
+    if(!qty||!bp){ errors.push(`Row ${rowId}: qty and buy price required`); return; }
+    const p = DB.products.find(x=>x.id===pid);
+    if(sp>0) p.sell=sp;
+    // Get SNs
+    const snText = document.getElementById('fse-sn-'+rowId)?.value||'';
+    const sns = snText.split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
+    if(p.type==='mobile') p.imeis=[...p.imeis,...sns];
+    else p.serials=[...p.serials,...sns];
+    DB.purchases.push({ id:'PU'+(DB.purchases.length+1).toString().padStart(4,'0'), pid, prodName:p.name, qty, price:bp, date, sup });
+    saved++;
+  });
+  if(errors.length) { showMsg('fse-msg', errors.join(' | '), 'err'); return; }
+  if(!saved) { showMsg('fse-msg','No rows to save','err'); return; }
+  refreshAllSelects(); renderProducts(); updateAlerts(); renderDash();
+  document.getElementById('fse-rows').innerHTML=''; fseRowCount=0; fseAddRow();
+  showMsg('fse-msg', `Saved ${saved} product entries!`, 'ok');
+}
+
+// Quick add product
+function qaAddProduct() {
+  const name=document.getElementById('qa-name').value.trim();
+  const catSel=document.getElementById('qa-cat').value;
+  const catNew=document.getElementById('qa-newcat').value.trim();
+  const cat=catNew||catSel;
+  const type=document.getElementById('qa-type').value;
+  const sell=parseFloat(document.getElementById('qa-sell').value)||0;
+  const alert=parseInt(document.getElementById('qa-alert').value)||5;
+  if(!name){showMsg('qa-msg','Name required','err');return;}
+  if(!cat){showMsg('qa-msg','Category required','err');return;}
+  if(catNew&&!DB.cats.includes(catNew))DB.cats.push(catNew);
+  const id='P'+(DB.products.length+1).toString().padStart(3,'0');
+  DB.products.push({id,name,cat,type,sell,alert,openingQty:0,openingCost:0,openingDate:today(),serials:[],imeis:[]});
+  refreshCatSelects();refreshAllSelects();renderFseRows();updateAlerts();
+  showMsg('qa-msg',`"${name}" added (${id}) — now available in rows above`,'ok');
+  ['qa-name','qa-sell','qa-newcat'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('qa-type').value='regular';
+}
+
+// ═══ PURCHASE WITH SN/IMEI ═══
+let puSnMode = 'rows'; // 'rows' or 'bulk'
+let puSnRowCount = 0;
+function onPuChange() {
+  const pid = document.getElementById('pu-prod').value;
+  const p = DB.products.find(x=>x.id===pid);
+  const titleEl = document.getElementById('pu-sn-title-text');
+  if(p) {
+    if(p.type==='mobile') titleEl.textContent='IMEI numbers for this purchase (one per unit)';
+    else if(p.type==='serial') titleEl.textContent='Serial numbers for this purchase (one per unit)';
+    else titleEl.textContent='Serial / IMEI numbers (optional — enter if this product has them)';
+  }
+  showPuHistory();
+  calcWacPrev();
+}
+function puSnToggleMode() {
+  puSnMode = puSnMode==='rows'?'bulk':'rows';
+  document.getElementById('pu-sn-rows').style.display = puSnMode==='rows'?'block':'none';
+  document.getElementById('pu-sn-bulk-wrap').style.display = puSnMode==='bulk'?'block':'none';
+  document.querySelector('[onclick="puSnToggleMode()"]').textContent = puSnMode==='rows'?'Switch to bulk paste':'Switch to individual rows';
+}
+function puSnAddRow() {
+  const container = document.getElementById('pu-sn-rows');
+  const id = ++puSnRowCount;
+  const pid = document.getElementById('pu-prod').value;
+  const p = DB.products.find(x=>x.id===pid);
+  const placeholder = p?.type==='mobile'?'IMEI number':'Serial number';
+  const div = document.createElement('div');
+  div.className='sn-row'; div.id='pu-sn-row-'+id;
+  div.innerHTML=`<input type="text" placeholder="${placeholder}" id="pu-sn-val-${id}" style="font-family:var(--mono)"><button class="sn-del" onclick="document.getElementById('pu-sn-row-${id}').remove()">✕</button>`;
+  container.appendChild(div);
+  updatePuSnCount();
+}
+function updatePuSnCount() {
+  const count = document.querySelectorAll('#pu-sn-rows .sn-row').length;
+  const el = document.getElementById('pu-sn-count');
+  if(el) el.textContent = count>0?`${count} serial/IMEI row(s) added`:'';
+}
+function getPuSerials() {
+  if(puSnMode==='bulk') {
+    const bulk = document.getElementById('pu-sn-bulk').value;
+    return bulk.split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
+  }
+  const vals=[];
+  document.querySelectorAll('[id^="pu-sn-val-"]').forEach(inp=>{ if(inp.value.trim()) vals.push(inp.value.trim()); });
+  return vals;
+}
+function clearPuForm() {
+  ['pu-prod','pu-qty','pu-price','pu-sup','pu-ref'].forEach(i=>{const el=document.getElementById(i);if(el){if(i==='pu-qty')el.value=1;else el.value='';}});
+  document.getElementById('pu-sn-rows').innerHTML=''; puSnRowCount=0;
+  document.getElementById('pu-sn-bulk').value='';
+  document.getElementById('wac-prev').style.display='none';
+  document.getElementById('pu-hist-panel').style.display='none';
+}
+function calcWacPrev() {
+  const pid=document.getElementById('pu-prod').value;
+  const nq=parseInt(document.getElementById('pu-qty').value)||0;
+  const np=parseFloat(document.getElementById('pu-price').value)||0;
+  const prev=document.getElementById('wac-prev');
+  if(!pid||!nq||!np){prev.style.display='none';return;}
+  const{wac,stock}=computeWAC(pid);
+  const nw=stock>0?Math.round((wac*stock+np*nq)/(stock+nq)):np;
+  prev.style.display='block';
+  document.getElementById('wac-prev-rows').innerHTML=`
+    <div class="wac-row"><span style="flex:1">Current: ${stock} units @ ${fmt(wac)}</span></div>
+    <div class="wac-row"><span style="flex:1">New purchase: ${nq} units @ ${fmt(np)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding-top:5px;margin-top:3px;border-top:1px solid rgba(26,79,160,.12);font-weight:600;font-size:12px;color:var(--bt)">
+      <span>New WAC after purchase</span><span class="mono">${fmt(nw)} / unit (was ${fmt(wac)})</span>
+    </div>`;
+}
+function showPuHistory() {
+  const pid=document.getElementById('pu-prod').value;
+  const p=DB.products.find(x=>x.id===pid);
+  const panel=document.getElementById('pu-hist-panel');
+  if(!p){panel.style.display='none';return;}
+  document.getElementById('pu-hist-title').textContent='Purchase history — '+p.name;
+  const buys=DB.purchases.filter(x=>x.pid===pid).sort((a,b)=>a.date.localeCompare(b.date));
+  const rows=[];
+  if((p.openingQty||0)>0) rows.push(`<tr><td>${fmtD(p.openingDate)}</td><td class="mono">${p.openingQty}</td><td class="mono">${fmt(p.openingCost)}</td><td class="mono">${fmt(p.openingCost*p.openingQty)}</td><td><span class="tag tg-m">Opening</span></td><td>—</td></tr>`);
+  buys.forEach(b=>{
+    const sns=(b.serials||[]).concat(b.imeis||[]);
+    rows.push(`<tr><td>${fmtD(b.date)}</td><td class="mono">${b.qty}</td><td class="mono">${fmt(b.price)}</td><td class="mono">${fmt(b.price*b.qty)}</td><td>${b.sup||'—'}</td><td style="font-size:10px;color:var(--ink3)">${sns.length?sns.join(', '):'—'}</td></tr>`);
+  });
+  document.getElementById('pu-hist-body').innerHTML = rows.length ?
+    `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Qty</th><th>Price/unit</th><th>Total</th><th>Supplier</th><th>SN/IMEI</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>
+    <div class="wac-box"><div style="font-size:11px;font-weight:600;color:var(--bt);margin-bottom:4px">Current WAC on remaining stock</div><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--bt)"><span>Stock: ${computeWAC(pid).stock} units</span><span>${fmt(computeWAC(pid).wac)}/unit</span></div></div>`:
+    '<div class="nr">No purchase history yet</div>';
+  panel.style.display='block';
+}
+function recPurchase() {
+  const pid=document.getElementById('pu-prod').value;
+  const qty=parseInt(document.getElementById('pu-qty').value)||0;
+  const price=parseFloat(document.getElementById('pu-price').value)||0;
+  const date=document.getElementById('pu-date').value;
+  const sup=document.getElementById('pu-sup').value.trim();
+  const ref=document.getElementById('pu-ref').value.trim();
+  if(!pid){showMsg('pu-msg','Select product','err');return;}
+  if(!qty){showMsg('pu-msg','Enter quantity','err');return;}
+  if(!price){showMsg('pu-msg','Enter price','err');return;}
+  if(!date){showMsg('pu-msg','Enter date','err');return;}
+  const p=DB.products.find(x=>x.id===pid);
+  const sns=getPuSerials();
+  const isIMEI=p.type==='mobile';
+  if(isIMEI) p.imeis=[...p.imeis,...sns];
+  else p.serials=[...p.serials,...sns];
+  DB.purchases.push({id:'PU'+(DB.purchases.length+1).toString().padStart(4,'0'),pid,prodName:p.name,qty,price,date,sup,ref,serials:isIMEI?[]:sns,imeis:isIMEI?sns:[]});
+  const newWac=computeWAC(pid).wac;
+  refreshAllSelects();renderProducts();updateAlerts();showPuHistory();calcWacPrev();
+  ['pu-qty','pu-price','pu-sup','pu-ref'].forEach(i=>document.getElementById(i).value=i==='pu-qty'?1:'');
+  document.getElementById('pu-sn-rows').innerHTML=''; puSnRowCount=0;
+  document.getElementById('pu-sn-bulk').value='';
+  document.getElementById('wac-prev').style.display='none';
+  showMsg('pu-msg',`Recorded. New WAC: ${fmt(newWac)}/unit${sns.length?' · '+sns.length+' SN/IMEI saved':''}`,'ok');
+}
+
+// ═══ SECOND-HAND ═══
+function prevPhoto(inp,prevId) { const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const d=document.getElementById(prevId);d.innerHTML=`<img src="${e.target.result}" style="width:56px;height:56px;object-fit:cover;border-radius:6px">`;inp.dataset.b64=e.target.result;};r.readAsDataURL(f); }
+function onShProd() { const pid=document.getElementById('sh-prod').value;const p=DB.products.find(x=>x.id===pid);if(p){document.getElementById('sh-cat').value=p.cat;document.getElementById('sh-sell').value=p.sell||'';} }
+function recSH() {
+  const sname=document.getElementById('sh-sname').value.trim();const sphone=document.getElementById('sh-sphone').value.trim();const sid=document.getElementById('sh-sid').value.trim();
+  const saddr=document.getElementById('sh-saddr').value.trim();const snote=document.getElementById('sh-snote').value.trim();
+  const photo=document.getElementById('sh-photo').dataset?.b64||'';const idphoto=document.getElementById('sh-idp').dataset?.b64||'';
+  const existPid=document.getElementById('sh-prod').value;const newProd=document.getElementById('sh-newprod').value.trim();const cat=document.getElementById('sh-cat').value;
+  const cond=document.getElementById('sh-cond').value;const cost=parseFloat(document.getElementById('sh-cost').value)||0;const sell=parseFloat(document.getElementById('sh-sell').value)||0;
+  const date=document.getElementById('sh-date').value;const imei=document.getElementById('sh-imei').value.trim();const serial=document.getElementById('sh-serial').value.trim();
+  if(!sname){showMsg('sh-msg','Seller name required','err');return;}if(!sid){showMsg('sh-msg','Seller ID required','err');return;}
+  if(!cost){showMsg('sh-msg','Buy price required','err');return;}if(!sell){showMsg('sh-msg','Sell price required','err');return;}if(!date){showMsg('sh-msg','Date required','err');return;}
+  let pid=existPid;
+  if(!pid&&newProd){if(!cat){showMsg('sh-msg','Category required','err');return;}const id='P'+(DB.products.length+1).toString().padStart(3,'0');DB.products.push({id,name:newProd,cat,type:imei?'mobile':'regular',sell,alert:2,openingQty:0,openingCost:0,openingDate:date,serials:[serial].filter(Boolean),imeis:[imei].filter(Boolean)});pid=id;refreshAllSelects();renderProducts();updateAlerts();}
+  if(!pid){showMsg('sh-msg','Select or enter product name','err');return;}
+  const p=DB.products.find(x=>x.id===pid);
+  DB.secondhand.push({id:'SH'+(DB.secondhand.length+1).toString().padStart(3,'0'),pid,prodName:p.name,cond,cost,sell,date,imei,serial,sname,sphone,sid,saddr,snote,photo,idphoto,profit:sell-cost});
+  renderShTable();renderDash();
+  showMsg('sh-msg',`Recorded! Potential profit: ${fmt(sell-cost)}`,'ok');
+  ['sh-sname','sh-sphone','sh-sid','sh-saddr','sh-snote','sh-newprod','sh-cost','sh-sell','sh-imei','sh-serial'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+}
+function renderShTable() {
+  const tbody=document.getElementById('sh-tbody');if(!DB.secondhand.length){tbody.innerHTML='<tr><td colspan="9" class="nr">No second-hand purchases yet</td></tr>';return;}
+  const C={good:'Good',fair:'Fair',poor:'Poor'};
+  tbody.innerHTML=[...DB.secondhand].reverse().map(s=>{const m=s.sell>0?Math.round((s.sell-s.cost)/s.sell*100):0;return`<tr><td>${fmtD(s.date)}</td><td>${s.prodName}</td><td><span class="tag ${s.cond==='good'?'tg-g':s.cond==='fair'?'tg-a':'tg-r'}">${C[s.cond]}</span></td><td>${s.sname}</td><td style="font-size:11px;color:var(--ink3)">${s.sid}</td><td class="mono">${fmt(s.cost)}</td><td class="mono">${fmt(s.sell)}</td><td class="mono ${m>=30?'up':m>=15?'wn':'dn'}">${m}%</td><td><button class="btn-s" style="padding:3px 7px;font-size:11px" onclick="viewSeller('${s.id}')">View ID</button></td></tr>`;}).join('');
+}
+function viewSeller(id) {
+  const s=DB.secondhand.find(x=>x.id===id);if(!s)return;
+  document.getElementById('seller-modal-body').innerHTML=`<div style="display:flex;gap:12px;margin-bottom:13px"><div>${s.photo?`<img src="${s.photo}" style="width:70px;height:70px;object-fit:cover;border-radius:7px;border:1px solid var(--b2)">`:'<div style="width:70px;height:70px;background:var(--s3);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink3)">No photo</div>'}</div><div style="flex:1"><div style="font-size:15px;font-weight:600;margin-bottom:3px">${s.sname}</div><div style="font-size:12px;color:var(--ink2)">${s.sphone||'No phone'}</div><div style="font-size:12px;color:var(--ink2);font-family:var(--mono)">${s.sid}</div><div style="font-size:11px;color:var(--ink3);margin-top:3px">${s.saddr||'No address'}</div></div></div>${s.idphoto?`<div style="margin-bottom:11px"><div style="font-size:11px;color:var(--ink3);margin-bottom:5px;font-weight:500">ID card:</div><img src="${s.idphoto}" style="max-width:100%;border-radius:6px;border:1px solid var(--b2)"></div>`:'<div style="font-size:11px;color:var(--ink3);margin-bottom:11px">No ID card photo</div>'}<table class="tbl"><tr><td style="color:var(--ink2)">Product</td><td>${s.prodName}</td></tr><tr><td style="color:var(--ink2)">Condition</td><td>${s.cond}</td></tr><tr><td style="color:var(--ink2)">Buy price</td><td class="mono">${fmt(s.cost)}</td></tr><tr><td style="color:var(--ink2)">Sell price</td><td class="mono">${fmt(s.sell)}</td></tr>${s.imei?`<tr><td style="color:var(--ink2)">IMEI</td><td class="mono">${s.imei}</td></tr>`:''}<tr><td style="color:var(--ink2)">Date</td><td>${fmtD(s.date)}</td></tr></table>`;
+  document.getElementById('seller-modal').classList.add('open');
+}
+
+// ═══ RECORD SALE ═══
+function onSlChange() { const pid=document.getElementById('sl-prod').value;const p=DB.products.find(x=>x.id===pid);if(p){const{wac}=computeWAC(pid);document.getElementById('sl-cost').value=wac;document.getElementById('sl-sell').value=p.sell||'';document.getElementById('sl-sn-row').style.display=p.type!=='regular'?'grid':'none';calcSale();}else{document.getElementById('sl-cost').value='';document.getElementById('sl-sell').value='';document.getElementById('sl-profit').value='';document.getElementById('sl-sn-row').style.display='none';} }
+function calcSale() { const s=parseFloat(document.getElementById('sl-sell').value)||0;const c=parseFloat(document.getElementById('sl-cost').value)||0;const q=parseInt(document.getElementById('sl-qty').value)||1;document.getElementById('sl-profit').value=s>0?fmt((s-c)*q):''; }
+function recSale() {
+  const emp=document.getElementById('sl-emp').value;const pid=document.getElementById('sl-prod').value;const qty=parseInt(document.getElementById('sl-qty').value)||1;const sell=parseFloat(document.getElementById('sl-sell').value)||0;
+  const imei=document.getElementById('sl-imei')?.value.trim()||'';const serial=document.getElementById('sl-serial')?.value.trim()||'';const cust=document.getElementById('sl-cust').value.trim()||'Walk-in';const date=document.getElementById('sl-date').value||today();
+  if(!emp){showMsg('sl-msg','Select employee','err');return;}if(!pid){showMsg('sl-msg','Select product','err');return;}if(!sell){showMsg('sl-msg','Enter price','err');return;}
+  const{wac,stock}=computeWAC(pid);if(stock<qty){showMsg('sl-msg','Only '+stock+' in stock','err');return;}
+  const p=DB.products.find(x=>x.id===pid);
+  DB.sales.push({id:DB.sales.length+1,date:date+'T'+new Date().toTimeString().substring(0,8),emp,pid,prodName:p.name,qty,wacAtSale:wac,unitSell:sell,sell:sell*qty,profit:(sell-wac)*qty,imei,serial,cust,status:'active'});
+  refreshAllSelects();renderProducts();updateAlerts();renderDash();renderSaleLog();clearSale();
+  showMsg('sl-msg',`Recorded! Profit: ${fmt((sell-wac)*qty)}`,'ok');
+}
+function clearSale() { ['sl-emp','sl-prod'].forEach(i=>document.getElementById(i).value='');document.getElementById('sl-qty').value=1;['sl-cost','sl-sell','sl-profit','sl-imei','sl-serial','sl-cust'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';}); }
+function renderSaleLog() {
+  const tbody=document.getElementById('sl-tbody');
+  if(!DB.sales.length){tbody.innerHTML='<tr><td colspan="10" class="nr">No sales yet</td></tr>';return;}
+  tbody.innerHTML=[...DB.sales].reverse().map(s=>{
+    const ei=DB.employees.findIndex(e=>e.name===s.emp);
+    const[bg,col]=ECC[Math.max(0,ei)%ECC.length];
+    const statusTag=s.status==='returned'?'<span class="tag tg-r">Returned</span>':s.status==='partial-return'?'<span class="tag tg-a">Part Return</span>':'<span class="tag tg-g">Active</span>';
+    return`<tr>
+      <td class="mono" style="color:var(--ink3)">${s.id}</td>
+      <td>${fmtD(s.date)}</td>
+      <td><span class="tag" style="background:${bg};color:${col}">${s.emp}</span></td>
+      <td>${s.prodName}${s.imei?`<br><span style="font-size:10px;color:var(--ink3);font-family:var(--mono)">${s.imei}</span>`:s.serial?`<br><span style="font-size:10px;color:var(--ink3);font-family:var(--mono)">${s.serial}</span>`:''}</td>
+      <td class="mono" style="text-align:center">${s.qty}</td>
+      <td class="mono">${fmt(s.sell)}</td>
+      <td class="mono" style="color:${s.profit>=0?'var(--gt)':'var(--rt)'};font-weight:600">${fmt(s.profit)}</td>
+      <td>${statusTag}</td>
+      <td style="white-space:nowrap">
+        <button class="btn-r" style="padding:3px 7px;font-size:11px" onclick="deleteSale(${s.id})" title="Delete sale &amp; restore stock">Del</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function deleteSale(id) {
+  const sale = DB.sales.find(s => s.id === id);
+  if (!sale) return;
+  const statusNote = sale.status !== 'active' ? ` (status: ${sale.status})` : '';
+  if (!confirm(`Delete sale #${id} — ${sale.prodName} x${sale.qty} by ${sale.emp}${statusNote}?\n\nThis will restore ${sale.qty} unit(s) back to stock. This cannot be undone.`)) return;
+  // If any returns exist for this sale, remove them too (stock was already re-added via return)
+  const linkedReturns = DB.returns.filter(r => r.saleId === id);
+  // Remove linked returns (their stock restoration is already factored in WAC engine via sale removal)
+  DB.returns = DB.returns.filter(r => r.saleId !== id);
+  // Remove the sale
+  DB.sales = DB.sales.filter(s => s.id !== id);
+  // WAC engine is event-sourced so removing the sale automatically restores stock in computeWAC
+  refreshAllSelects(); renderProducts(); updateAlerts(); renderDash(); renderSaleLog(); renderRetLog();
+  const note = linkedReturns.length ? ` Also removed ${linkedReturns.length} linked return(s).` : '';
+  alert(`Sale #${id} deleted. ${sale.qty} unit(s) of "${sale.prodName}" restored to stock.${note}`);
+}
+
+// ═══ RETURN ═══
+function recReturn() {
+  const sid=parseInt(document.getElementById('rt-sale').value);const qty=parseInt(document.getElementById('rt-qty').value)||1;const reason=document.getElementById('rt-reason').value;const note=document.getElementById('rt-note').value.trim();
+  if(!sid){showMsg('rt-msg','Select sale','err');return;}const sale=DB.sales.find(s=>s.id===sid);if(!sale)return;if(qty>sale.qty){showMsg('rt-msg','Max: '+sale.qty,'err');return;}
+  const refund=Math.round(sale.unitSell*qty);sale.status=qty>=sale.qty?'returned':'partial-return';
+  DB.returns.push({id:DB.returns.length+1,date:new Date().toISOString(),saleId:sid,pid:sale.pid,prodName:sale.prodName,qty,reason,note,refund,profitReversed:Math.round(sale.profit/sale.qty*qty),wacAtSale:sale.wacAtSale});
+  renderRetLog();renderSaleLog();refreshAllSelects();renderProducts();updateAlerts();renderDash();showMsg('rt-msg',`Done. Refund: ${fmt(refund)}`,'ok');
+}
+function renderRetLog() {
+  const tbody=document.getElementById('rt-tbody');
+  if(!DB.returns.length){tbody.innerHTML='<tr><td colspan="7" class="nr">No returns</td></tr>';return;}
+  const R={defective:'Defective',wrong:'Wrong product',changed_mind:'Changed mind',other:'Other'};
+  tbody.innerHTML=[...DB.returns].reverse().map(r=>`<tr>
+    <td class="mono">${r.id}</td>
+    <td>${fmtD(r.date)}</td>
+    <td>${r.prodName}</td>
+    <td class="mono">${r.qty}</td>
+    <td>${R[r.reason]||r.reason}</td>
+    <td class="mono" style="color:var(--rt)">${fmt(r.refund)}</td>
+    <td style="white-space:nowrap">
+      <button class="btn-r" style="padding:3px 7px;font-size:11px" onclick="deleteReturn(${r.id})" title="Delete return — stock will be deducted again">Del</button>
+    </td>
+  </tr>`).join('');
+  refreshAllSelects();
+}
+
+function deleteReturn(id) {
+  const ret = DB.returns.find(r => r.id === id);
+  if (!ret) return;
+  if (!confirm(`Delete return #${id} — ${ret.prodName} x${ret.qty}?\n\nThis will remove the return record. The ${ret.qty} unit(s) that were restored to stock will be deducted again. This cannot be undone.`)) return;
+  // Restore the original sale status if it was fully returned
+  const origSale = DB.sales.find(s => s.id === ret.saleId);
+  if (origSale && origSale.status === 'returned') {
+    origSale.status = 'active'; // reactivate — stock is deducted again via WAC engine
+  } else if (origSale && origSale.status === 'partial-return') {
+    origSale.status = 'active';
+  }
+  DB.returns = DB.returns.filter(r => r.id !== id);
+  // WAC engine re-computes automatically — return was a "buy" event, removing it deducts from stock
+  refreshAllSelects(); renderProducts(); updateAlerts(); renderDash(); renderSaleLog(); renderRetLog();
+  alert(`Return #${id} deleted. ${ret.qty} unit(s) of "${ret.prodName}" deducted from stock again.`);
+}
+
+// ═══ EXPENSES ═══
+function addExp() { const cat=document.getElementById('ex-cat').value;const amt=parseFloat(document.getElementById('ex-amt').value)||0;const date=document.getElementById('ex-date').value;const desc=document.getElementById('ex-desc').value.trim();if(!cat){showMsg('ex-msg','Category required','err');return;}if(!amt){showMsg('ex-msg','Amount required','err');return;}if(!date){showMsg('ex-msg','Date required','err');return;}DB.expenses.push({id:DB.expenses.length+1,cat,amt,date,desc});renderExp();renderDash();showMsg('ex-msg','Added','ok');document.getElementById('ex-amt').value='';document.getElementById('ex-desc').value=''; }
+function renderExp() {
+  const cf=document.getElementById('ex-f-cat')?.value||'';const mf=document.getElementById('ex-f-mon')?.value||'';let ex=DB.expenses;if(cf)ex=ex.filter(e=>e.cat===cf);if(mf)ex=ex.filter(e=>e.date.startsWith(mf));
+  const tbody=document.getElementById('ex-tbody');if(!ex.length){tbody.innerHTML='<tr><td colspan="4" class="nr">No expenses</td></tr>';document.getElementById('ex-total-row').style.display='none';return;}
+  tbody.innerHTML=[...ex].reverse().map(e=>`<tr><td>${fmtD(e.date)}</td><td><span class="tag tg-m">${e.cat}</span></td><td>${e.desc||'—'}</td><td class="mono" style="text-align:right">${fmt(e.amt)}</td></tr>`).join('');
+  document.getElementById('ex-total').textContent=fmt(ex.reduce((a,e)=>a+e.amt,0));document.getElementById('ex-total-row').style.display='block';
+  const mons=[...new Set(DB.expenses.map(e=>e.date.substring(0,7)))].sort().reverse();const ms=document.getElementById('ex-f-mon');const cm=ms.value;ms.innerHTML='<option value="">All months</option>'+mons.map(m=>`<option value="${m}">${m}</option>`).join('');ms.value=cm;
+}
+
+// ═══ EMPLOYEES ═══
+function addEmp() {
+  const name=document.getElementById('em-name').value.trim();const role=document.getElementById('em-role').value.trim()||'Salesperson';const sal=parseFloat(document.getElementById('em-sal').value)||0;const phone=document.getElementById('em-phone').value.trim();const join=document.getElementById('em-join').value;const comm=parseFloat(document.getElementById('em-comm').value)||0;
+  if(!name){showMsg('em-msg','Name required','err');return;}if(DB.employees.find(e=>e.name===name)){showMsg('em-msg','Already exists','err');return;}
+  DB.employees.push({id:'EMP'+(DB.employees.length+1).toString().padStart(3,'0'),name,role,sal,phone,join,comm});
+  refreshEmpSelect();renderEmps();renderDash();showMsg('em-msg',name+' added','ok');
+  ['em-name','em-role','em-sal','em-phone','em-join','em-comm'].forEach(i=>document.getElementById(i).value='');
+}
+function editEmp(id) { const e=DB.employees.find(x=>x.id===id);if(!e)return;const ns=parseFloat(prompt(`Edit base salary for ${e.name} (current: ${e.sal}):`,e.sal));if(!isNaN(ns)&&ns>=0){e.sal=ns;renderEmps();renderDash();} }
+function deleteEmp(id) { if(!confirm('Delete this employee?'))return;DB.employees=DB.employees.filter(e=>e.id!==id);refreshEmpSelect();renderEmps();renderDash(); }
+function renderEmps() {
+  const el=document.getElementById('em-list');if(!DB.employees.length){el.innerHTML='<div class="nr">No employees yet</div>';return;}
+  el.innerHTML=DB.employees.map((e,i)=>{const[bg,col]=ECC[i%ECC.length];const ss=DB.sales.filter(s=>s.emp===e.name&&s.status!=='returned');const totS=ss.reduce((a,s)=>a+s.sell,0);const totP=ss.reduce((a,s)=>a+s.profit,0);const comm=Math.round(totS*(e.comm/100));return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b)"><div style="width:32px;height:32px;border-radius:50%;background:${bg};color:${col};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0">${e.name[0]}</div><div style="flex:1"><div style="font-size:13px;font-weight:500">${e.name} <span style="font-size:10px;color:var(--ink3);font-weight:400">${e.id} · ${e.role}</span></div><div style="font-size:11px;color:var(--ink3)">${e.phone||'No phone'} · Joined: ${e.join?fmtD(e.join):'—'}</div></div><div style="text-align:right;font-size:11px"><div style="font-weight:500">${ss.length} sales · ${fmt(totS)}</div><div style="color:var(--gt)">Profit: ${fmt(totP)}</div></div><div style="text-align:right;font-size:11px;min-width:110px"><div>Base: <span class="mono">${fmt(e.sal)}/mo</span></div><div style="color:var(--gt)">Commission: ${fmt(comm)}</div></div><div style="display:flex;gap:5px;flex-shrink:0"><button class="btn-s" style="padding:4px 8px;font-size:11px" onclick="editEmp('${e.id}')">Edit</button><button class="btn-r" style="padding:4px 8px;font-size:11px" onclick="deleteEmp('${e.id}')">Del</button></div></div>`;}).join('');
+}
+
+// ═══ ANALYTICS ═══
+function getProdStats() {
+  return DB.products.map(p=>{
+    const ss=DB.sales.filter(s=>s.pid===p.id&&s.status!=='returned');
+    const{wac,stock}=computeWAC(p.id);
+    const units=ss.reduce((a,s)=>a+s.qty,0);const rev=ss.reduce((a,s)=>a+s.sell,0);const profit=ss.reduce((a,s)=>a+s.profit,0);
+    const now=Date.now();const w7=ss.filter(s=>now-new Date(s.date)<=7*864e5).reduce((a,s)=>a+s.qty,0);const p7=ss.filter(s=>now-new Date(s.date)>7*864e5&&now-new Date(s.date)<=14*864e5).reduce((a,s)=>a+s.qty,0);
+    const trendPct=p7>0?Math.round((w7-p7)/p7*100):(w7>0?100:0);
+    return{...p,units,rev,profit,wac,stock,w7,p7,trendPct};
+  });
+}
+function renderAnalytics() {
+  const stats=getProdStats().sort((a,b)=>b.units-a.units);
+  const best=stats[0];const worst=stats[stats.length-1];const trending=stats.slice().sort((a,b)=>b.trendPct-a.trendPct)[0];
+  const empStats=DB.employees.map(e=>{const ss=DB.sales.filter(s=>s.emp===e.name&&s.status!=='returned');return{...e,cnt:ss.length,sales:ss.reduce((a,s)=>a+s.sell,0),profit:ss.reduce((a,s)=>a+s.profit,0)};}).sort((a,b)=>b.profit-a.profit);
+  const bestEmp=empStats[0];
+  document.getElementById('an-best').textContent=best?.name||'—';document.getElementById('an-best-v').textContent=best?(best.units+' units sold'):'';
+  document.getElementById('an-worst').textContent=worst?.name||'—';document.getElementById('an-worst-v').textContent=worst?(worst.units+' units sold'):'';
+  document.getElementById('an-trend').textContent=trending?.name||'—';document.getElementById('an-trend-v').textContent=trending?(trending.trendPct>0?'+'+trending.trendPct+'% this week':'Flat'):'';
+  document.getElementById('an-emp').textContent=bestEmp?.name||'—';document.getElementById('an-emp-v').textContent=bestEmp?fmt(bestEmp.profit)+' profit':'';
+  const maxU=stats[0]?.units||1;
+  document.getElementById('an-rank').innerHTML=stats.slice(0,8).map((p,i)=>`<div class="abar"><span class="abar-rank">${i+1}</span><span class="abar-name">${p.name}</span><div class="abar-bg"><div class="abar-fill" style="width:${Math.round(p.units/maxU*100)}%;background:var(--blue)"></div></div><span class="abar-val">${p.units}</span>${i===0?'<span class="tag tg-g">Best</span>':''}</div>`).join('')||'<div class="nr">No sales yet</div>';
+  const worst5=[...stats].sort((a,b)=>a.units-b.units).slice(0,5);const maxW=Math.max(...worst5.map(p=>p.units),1);
+  document.getElementById('an-worst-list').innerHTML=worst5.map((p,i)=>`<div class="abar"><span class="abar-rank">${i+1}</span><span class="abar-name">${p.name}</span><div class="abar-bg"><div class="abar-fill" style="width:${Math.round(p.units/maxW*100)}%;background:#e24b4a"></div></div><span class="abar-val">${p.units}</span>${p.stock>p.alert*3?'<span class="tag tg-r">Overstocked</span>':''}</div>`).join('')||'<div class="nr">No data</div>';
+  document.getElementById('an-emp-board').innerHTML=empStats.length?empStats.map((e,i)=>{const[bg,col]=ECC[i%ECC.length];return`<div class="abar"><div style="width:22px;height:22px;border-radius:50%;background:${bg};color:${col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0">${e.name[0]}</div><span class="abar-name">${e.name}</span><span style="font-size:11px;color:var(--ink3)">${e.cnt} sales</span><span class="abar-val">${fmt(e.profit)}</span>${i===0&&e.profit>0?'<span class="tag tg-g">★ Best</span>':''}</div>`;}).join(''):'<div class="nr">No employees</div>';
+  const trendList=[...stats].sort((a,b)=>b.trendPct-a.trendPct).slice(0,6);
+  document.getElementById('an-trending').innerHTML=trendList.map(p=>{const cls=p.trendPct>20?'tg-g':p.trendPct>0?'tg-a':'tg-r';return`<div class="abar"><span class="abar-name">${p.name}</span><span class="abar-val" style="color:${p.trendPct>=0?'var(--gt)':'var(--rt)'}">${p.trendPct>0?'+':''}${p.trendPct}%</span><span class="tag ${cls}">${p.trendPct>20?'Hot':p.trendPct>0?'Rising':'Falling'}</span></div>`;}).join('')||'<div class="nr">No data</div>';
+}
+
+// ═══ P&L ═══
+function renderPL() {
+  const rev=DB.sales.filter(s=>s.status!=='returned').reduce((a,s)=>a+s.sell,0);const cogs=DB.sales.filter(s=>s.status!=='returned').reduce((a,s)=>a+s.wacAtSale*s.qty,0);const exps=DB.expenses.reduce((a,e)=>a+e.amt,0);const retRef=DB.returns.reduce((a,r)=>a+r.refund,0);const net=rev-cogs-exps-retRef;const margin=rev>0?Math.round(net/rev*100):0;
+  document.getElementById('pl-rev').textContent=fmt(rev);document.getElementById('pl-cogs').textContent=fmt(cogs);document.getElementById('pl-exp').textContent=fmt(exps);document.getElementById('pl-net').textContent=fmt(net);document.getElementById('pl-mgn').textContent=margin+'% margin';document.getElementById('pl-mgn').className='ms '+(margin>=0?'up':'dn');
+  const expByCat={};DB.expenses.forEach(e=>{expByCat[e.cat]=(expByCat[e.cat]||0)+e.amt;});
+  document.getElementById('pl-detail').innerHTML=`<div class="pl-r"><span style="color:var(--ink2)">Revenue</span><span class="mono" style="color:var(--gt)">+${fmt(rev)}</span></div><div class="pl-r"><span style="color:var(--ink2)">COGS (WAC)</span><span class="mono" style="color:var(--rt)">-${fmt(cogs)}</span></div><div class="pl-r pl-t"><span>Gross profit</span><span class="mono" style="color:var(--gt)">${fmt(rev-cogs)}</span></div>`+Object.entries(expByCat).map(([k,v])=>`<div class="pl-r"><span style="color:var(--ink2)">${k}</span><span class="mono" style="color:var(--rt)">-${fmt(v)}</span></div>`).join('')+(retRef>0?`<div class="pl-r"><span style="color:var(--ink2)">Return refunds</span><span class="mono" style="color:var(--rt)">-${fmt(retRef)}</span></div>`:'')+`<div class="pl-r pl-t"><span style="font-weight:600">Net profit</span><span class="mono" style="color:${net>=0?'var(--gt)':'var(--rt)'};font-size:15px">${fmt(net)}</span></div>`;
+  const shRev=DB.secondhand.reduce((a,s)=>a+s.sell,0);const shCost=DB.secondhand.reduce((a,s)=>a+s.cost,0);
+  document.getElementById('pl-sh').innerHTML=`<div class="pl-r"><span style="color:var(--ink2)">Items bought</span><span class="mono">${DB.secondhand.length}</span></div><div class="pl-r"><span style="color:var(--ink2)">Total buy cost</span><span class="mono" style="color:var(--rt)">${fmt(shCost)}</span></div><div class="pl-r"><span style="color:var(--ink2)">Expected sell revenue</span><span class="mono" style="color:var(--gt)">${fmt(shRev)}</span></div><div class="pl-r pl-t"><span style="font-weight:600">Potential profit</span><span class="mono" style="color:var(--gt)">${fmt(shRev-shCost)}</span></div>`;
+}
+
+// ═══ DASHBOARD ═══
+function renderDash() {
+  const units=DB.products.reduce((a,p)=>a+computeWAC(p.id).stock,0);const val=DB.products.reduce((a,p)=>{const{wac,stock}=computeWAC(p.id);return a+wac*stock;},0);
+  const rev=DB.sales.filter(s=>s.status!=='returned').reduce((a,s)=>a+s.sell,0);const profit=DB.sales.filter(s=>s.status!=='returned').reduce((a,s)=>a+s.profit,0)-DB.returns.reduce((a,r)=>a+r.profitReversed,0);
+  document.getElementById('d-prods').textContent=DB.products.length;document.getElementById('d-cats').textContent=[...new Set(DB.products.map(p=>p.cat))].length+' categories';
+  document.getElementById('d-units').textContent=units.toLocaleString();document.getElementById('d-val').textContent='Value: '+fmt(val);
+  document.getElementById('d-rev').textContent=fmt(rev);document.getElementById('d-txn').textContent=DB.sales.length+' sales';
+  document.getElementById('d-profit').textContent=fmt(profit);const margin=rev>0?Math.round(profit/rev*100):0;document.getElementById('d-margin').textContent='Margin: '+margin+'%';document.getElementById('d-margin').className='ms '+(margin>=0?'up':'dn');
+  const stats=getProdStats().sort((a,b)=>b.units-a.units).slice(0,5);const maxU=stats[0]?.units||1;
+  document.getElementById('d-best').innerHTML=stats.length?stats.map((p,i)=>`<div class="abar"><span class="abar-rank">${i+1}</span><span class="abar-name">${p.name}</span><div class="abar-bg"><div class="abar-fill" style="width:${Math.round(p.units/maxU*100)}%;background:var(--blue)"></div></div><span class="abar-val">${p.units}</span></div>`).join(''):'<div class="nr">No sales yet</div>';
+  const trendStats=getProdStats().sort((a,b)=>b.trendPct-a.trendPct).slice(0,5);
+  document.getElementById('d-trend').innerHTML=trendStats.length?trendStats.map(p=>{const cls=p.trendPct>20?'tg-g':p.trendPct>0?'tg-a':'tg-r';return`<div class="abar"><span class="abar-name">${p.name}</span><span class="abar-val" style="color:${p.trendPct>=0?'var(--gt)':'var(--rt)'}">${p.trendPct>0?'+':''}${p.trendPct}%</span><span class="tag ${cls}">${p.trendPct>20?'Hot':p.trendPct>0?'Rising':'Falling'}</span></div>`;}).join(''):'<div class="nr">Add sales to see trends</div>';
+  const empStats=DB.employees.map((e,i)=>{const ss=DB.sales.filter(s=>s.emp===e.name&&s.status!=='returned');return{...e,i,cnt:ss.length,sales:ss.reduce((a,s)=>a+s.sell,0),profit:ss.reduce((a,s)=>a+s.profit,0)};}).sort((a,b)=>b.profit-a.profit);
+  const total=empStats.reduce((a,e)=>a+e.cnt,0);const avg=empStats.length>0?total/empStats.length:0;
+  document.getElementById('d-emp').innerHTML=empStats.length?empStats.map((e,idx)=>{const[bg,col]=ECC[e.i%ECC.length];return`<div class="abar"><div style="width:22px;height:22px;border-radius:50%;background:${bg};color:${col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0">${e.name[0]}</div><span class="abar-name">${e.name}</span><span style="font-size:11px;color:var(--ink3)">${e.cnt} sales</span><span class="abar-val">${fmt(e.profit)}</span>${idx===0&&e.profit>0?'<span class="tag tg-g">Best</span>':''}</div>`;}).join('')+(total>8&&empStats.some(e=>e.cnt<avg*0.4)?'<div style="background:var(--rl);border-radius:6px;padding:7px 10px;margin-top:7px;font-size:11px;color:var(--rt)"><strong>Warning:</strong> Possible unrecorded sales detected.</div>':''):'<div class="nr">No employees — <a href="#" onclick="sv(\'employees\')" style="color:var(--acc)">Add employees</a></div>';
+  const low=DB.products.map(p=>{const{stock}=computeWAC(p.id);return{...p,stock};}).filter(p=>p.stock<=p.alert).sort((a,b)=>a.stock-b.stock);
+  document.getElementById('d-low').innerHTML=low.length?low.slice(0,7).map(p=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b);font-size:12px"><span>${p.name}</span><span class="mono ${p.stock===0?'dn':'wn'}" style="font-weight:600">${p.stock}</span></div>`).join(''):'<div class="nr">All stock OK</div>';
+}
+function updateAlerts() {
+  const cnt=DB.products.filter(p=>computeWAC(p.id).stock<=p.alert).length;
+  document.getElementById('low-badge').textContent=cnt;document.getElementById('alert-txt').textContent=cnt+' low stock';
+}
+
+// ═══ BACKUP & AUTO-BACKUP ═══
+let autoBackupInterval=null;
+let lastBackupTime=null;
+function backupJSON(silent) {
+  const json=JSON.stringify({...DB,backupDate:new Date().toISOString(),version:'v6'},null,2);
+  const fn=`ShopPro_backup_${new Date().toISOString().replace(/[:.]/g,'-').substring(0,19)}.json`;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));a.download=fn;a.click();
+  lastBackupTime=new Date();
+  logBackup('Local disk: '+fn);
+  if(!silent){const el=document.getElementById('backup-status-text');if(el)el.textContent='Backup downloaded: '+fn;}
+  updateBackupStatus();
+  return fn;
+}
+function backupGmail() {
+  backupJSON(true);
+  const sub=encodeURIComponent('Shop Pro Backup — '+new Date().toLocaleDateString());
+  const body=encodeURIComponent('Your Shop Pro backup has been downloaded to your computer. Attach that .json file to this email and send to yourself for safekeeping.\n\nBackup time: '+new Date().toLocaleString()+'\n\nProducts: '+DB.products.length+'\nSales: '+DB.sales.length+'\nEmployees: '+DB.employees.length);
+  window.open('https://mail.google.com/mail/?view=cm&fs=1&to=me&su='+sub+'&body='+body,'_blank');
+  logBackup('Gmail: compose opened');
+}
+function restoreJSON(inp) {
+  const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=e=>{try{const d=JSON.parse(e.target.result);['products','purchases','sales','returns','expenses','employees','secondhand','cats','exCats'].forEach(k=>{if(d[k])DB[k]=d[k];});if(d.settings)Object.assign(DB.settings,d.settings);refreshCatSelects();refreshExCatSelect();refreshAllSelects();renderDash();renderProducts();renderEmps();renderShTable();renderSaleLog();updateAlerts();renderFseRows();alert('Backup restored from '+f.name+'. All data loaded.');logBackup('Restored from: '+f.name);}catch(err){alert('Error reading backup. Make sure it is a valid Shop Pro .json file.');}};
+  r.readAsText(f);
+}
+function toggleAutoBackup() {
+  DB.settings.autoBackup = !DB.settings.autoBackup;
+  const toggle=document.getElementById('auto-backup-toggle');const label=document.getElementById('auto-backup-label');
+  if(DB.settings.autoBackup){toggle.classList.add('on');label.textContent='Auto-backup enabled';startAutoBackup();}
+  else{toggle.classList.remove('on');label.textContent='Enable auto-backup';stopAutoBackup();}
+  updateBackupStatus();
+}
+function startAutoBackup() {
+  if(autoBackupInterval) clearInterval(autoBackupInterval);
+  autoBackupInterval=setInterval(()=>{backupJSON(true);logBackup('Auto-backup to disk');updateBackupStatus();},30*60*1000);
+  document.getElementById('next-backup-time').textContent='Next auto-backup in 30 minutes';
+  updateBackupStatus();
+}
+function stopAutoBackup() { if(autoBackupInterval){clearInterval(autoBackupInterval);autoBackupInterval=null;}document.getElementById('next-backup-time').textContent=''; }
+function updateBackupStatus() {
+  const sb=document.getElementById('sb-backup-status');const t=lastBackupTime?lastBackupTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'never';
+  if(sb) sb.textContent=`Auto: ${DB.settings.autoBackup?'ON':'OFF'} · Last: ${t}`;
+}
+function logBackup(msg) {
+  const el=document.getElementById('backup-log');if(!el)return;
+  const existing=el.innerHTML==='No backups taken yet.'?'':el.innerHTML;
+  el.innerHTML=`<div style="padding:4px 0;border-bottom:1px solid var(--b);font-size:12px"><span class="mono" style="color:var(--ink3)">${new Date().toLocaleString()}</span> — ${msg}</div>`+existing;
+}
+
+// ═══ EXPORT CSV ═══
+function exportCSV(type) {
+  let rows=[],fn='';
+  if(type==='sales'){fn='sales.csv';rows=[['#','Date','Employee','Product','Qty','IMEI/SN','Unit Sell','Total Sale','WAC Cost','Profit','Status']];DB.sales.forEach(s=>rows.push([s.id,fmtD(s.date),s.emp,s.prodName,s.qty,s.imei||s.serial||'',Math.round(s.unitSell),Math.round(s.sell),Math.round(s.wacAtSale*s.qty),Math.round(s.profit),s.status]));}
+  else if(type==='purchases'){fn='purchases.csv';rows=[['#','Date','Product','Qty','Price/unit','Total','Supplier','Ref','SN/IMEI']];DB.purchases.forEach(p=>{const sns=[...(p.serials||[]),...(p.imeis||[])];rows.push([p.id,fmtD(p.date),p.prodName,p.qty,Math.round(p.price),Math.round(p.price*p.qty),p.sup||'',p.ref||'',sns.join('; ')]);});}
+  else if(type==='expenses'){fn='expenses.csv';rows=[['#','Date','Category','Description','Amount']];DB.expenses.forEach(e=>rows.push([e.id,fmtD(e.date),e.cat,e.desc||'',Math.round(e.amt)]));}
+  else if(type==='secondhand'){fn='secondhand.csv';rows=[['#','Date','Product','Condition','Seller','Phone','ID','Address','Buy','Sell','IMEI','Serial']];DB.secondhand.forEach(s=>rows.push([s.id,fmtD(s.date),s.prodName,s.cond,s.sname,s.sphone,s.sid,s.saddr,Math.round(s.cost),Math.round(s.sell),s.imei||'',s.serial||'']));}
+  else if(type==='returns'){fn='returns.csv';rows=[['#','Date','Product','Qty','Reason','Notes','Refund']];DB.returns.forEach(r=>rows.push([r.id,fmtD(r.date),r.prodName,r.qty,r.reason,r.note||'',Math.round(r.refund)]));}
+  else if(type==='pl'){fn='pl_monthly.csv';rows=[['Month','Revenue','COGS','Gross Profit','Expenses','Returns','Net Profit','Margin %']];const months=[...new Set([...DB.sales.map(s=>s.date.substring(0,7)),...DB.expenses.map(e=>e.date.substring(0,7))])].sort();months.forEach(m=>{const rev=DB.sales.filter(s=>s.date.startsWith(m)&&s.status!=='returned').reduce((a,s)=>a+s.sell,0);const cogs=DB.sales.filter(s=>s.date.startsWith(m)&&s.status!=='returned').reduce((a,s)=>a+s.wacAtSale*s.qty,0);const exp=DB.expenses.filter(e=>e.date.startsWith(m)).reduce((a,e)=>a+e.amt,0);const ret=DB.returns.filter(r=>r.date.startsWith(m)).reduce((a,r)=>a+r.refund,0);const net=rev-cogs-exp-ret;rows.push([m,Math.round(rev),Math.round(cogs),Math.round(rev-cogs),Math.round(exp),Math.round(ret),Math.round(net),rev>0?Math.round(net/rev*100)+'%':'0%']);});}
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=fn;a.click();
+}
+
+// ═══ AI AGENT (with user's own API key) ═══
+const chatHist=[];
+function loadApiKey() { const k=localStorage.getItem('shopPro_apiKey')||'';document.getElementById('ai-key').value=k;if(k)document.getElementById('ai-api-key-label').textContent='API key: set'; }
+function saveApiKey() { const k=document.getElementById('ai-key').value.trim();localStorage.setItem('shopPro_apiKey',k);document.getElementById('ai-api-key-label').textContent=k?'API key: set':'API key: not set'; }
+function gotoAI() { sv('ai'); }
+function getCtx() {
+  const pStats=getProdStats().sort((a,b)=>b.units-a.units);const best=pStats[0];const worst=pStats[pStats.length-1];const trending=pStats.slice().sort((a,b)=>b.trendPct-a.trendPct)[0];
+  const empStats=DB.employees.map(e=>{const ss=DB.sales.filter(s=>s.emp===e.name&&s.status!=='returned');return{name:e.name,sal:e.sal,cnt:ss.length,sales:ss.reduce((a,s)=>a+s.sell,0),profit:ss.reduce((a,s)=>a+s.profit,0)};});
+  const rev=DB.sales.filter(s=>s.status!=='returned').reduce((a,s)=>a+s.sell,0);const profit=DB.sales.filter(s=>s.status!=='returned').reduce((a,s)=>a+s.profit,0);const exps=DB.expenses.reduce((a,e)=>a+e.amt,0);
+  return`LIVE SHOP DATA:
+Products: ${DB.products.length} | Revenue: ৳${Math.round(rev)} | Profit: ৳${Math.round(profit)} | Expenses: ৳${Math.round(exps)}
+Sales: ${DB.sales.length} | Returns: ${DB.returns.length} | Second-hand items: ${DB.secondhand.length}
+Best seller: ${best?.name||'none'} (${best?.units||0} units sold)
+Worst seller: ${worst?.name||'none'} (${worst?.units||0} units sold)
+Trending: ${trending?.name||'none'} (${trending?.trendPct||0}% this week vs prior week)
+Employees: ${JSON.stringify(empStats)}
+Low stock: ${DB.products.filter(p=>computeWAC(p.id).stock<=p.alert).map(p=>p.name+'('+computeWAC(p.id).stock+')').join(', ')||'none'}
+Top products: ${pStats.slice(0,5).map(p=>p.name+'('+p.units+' sold, margin '+(p.sell>0?Math.round((p.sell-p.wac)/p.sell*100):0)+'%)').join(', ')}`;
+}
+const SYS=`You are an AI shop management agent for a mobile and computer accessories shop in Bangladesh. You have full live shop data. Use ৳ currency. Be specific and actionable. Answer in 2-4 short paragraphs.`;
+async function callAI(msg) {
+  const apiKey=localStorage.getItem('shopPro_apiKey')||document.getElementById('ai-key')?.value.trim()||'';
+  if(!apiKey){appendMsg('ai','Please enter your Anthropic API key in the field above to enable AI responses. Get one at console.anthropic.com');return;}
+  chatHist.push({role:'user',content:msg});
+  const tid='t'+Date.now();appendMsg('ai',null,tid);
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS+'\n\n'+getCtx(),messages:chatHist})});
+    const d=await r.json();
+    if(d.error){document.getElementById(tid)?.remove();appendMsg('ai','API error: '+d.error.message);return;}
+    const reply=d.content?.find(b=>b.type==='text')?.text||'No response received.';
+    chatHist.push({role:'assistant',content:reply});document.getElementById(tid)?.remove();appendMsg('ai',reply.replace(/\n/g,'<br>'));
+  }catch(e){document.getElementById(tid)?.remove();appendMsg('ai','Connection error: '+e.message);}
+}
+function appendMsg(role,html,id) {
+  const msgs=document.getElementById('chat-msgs');const div=document.createElement('div');div.className='msg'+(role==='user'?' msg-u':'');if(id)div.id=id;
+  const c=html===null?`<div class="thinking"><div class="dp"></div><div class="dp"></div><div class="dp"></div></div>`:`<div class="bbl ${role==='ai'?'abbl':'ubbl'}">${html}</div>`;
+  div.innerHTML=`<div class="mav ${role==='ai'?'aav':'uav'}">${role==='ai'?'AI':'You'}</div>${c}`;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+function askAI(t){sv('ai');appendMsg('user',t);callAI(t);}
+function sendAI(){const inp=document.getElementById('chat-in');const t=inp.value.trim();if(!t)return;inp.value='';appendMsg('user',t);callAI(t);}
+function hkAI(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAI();}}
+
+// ═══ BRANDS & VARIANTS ═══
+function renderBrandsView() {
+  const allBrands=[...DB.brands.phone,...DB.brands.acc,...DB.brands.router];
+  const customCount=[...DB.brands.phone,...DB.brands.acc,...DB.brands.router].filter(b=>b.custom).length;
+  document.getElementById('bv-total-brands').textContent=[...new Set(allBrands.map(b=>b.name))].length;
+  document.getElementById('bv-total-variants').textContent=DB.variants.length;
+  document.getElementById('bv-branded-prods').textContent=DB.products.filter(p=>p.brand).length;
+  document.getElementById('bv-custom').textContent=customCount;
+  renderBrandGroup('phone','bv-phone-brands');
+  renderBrandGroup('acc','bv-acc-brands');
+  renderBrandGroup('router','bv-router-brands');
+  renderVariantChips();
+  // Update brand filter select
+  const bfsel=document.getElementById('bv-filter-brand');
+  const uBrands=[...new Set(allBrands.map(b=>b.name))].sort();
+  bfsel.innerHTML='<option value="">All brands</option>'+uBrands.map(b=>`<option value="${b}">${b}</option>`).join('');
+  renderBrandProducts();
+}
+function renderBrandGroup(group, elId) {
+  const el=document.getElementById(elId);
+  el.innerHTML=DB.brands[group].map((b,i)=>`
+    <div class="brand-chip" style="background:${b.bg};color:${b.color}" onclick="toggleBrandDefault('${group}',${i})">
+      <span style="font-size:11px;font-weight:600">${b.name}</span>
+      ${b.custom?`<span onclick="event.stopPropagation();deleteBrand('${group}',${i})" style="cursor:pointer;opacity:.5;font-size:10px;margin-left:2px">✕</span>`:''}
+    </div>`).join('');
+}
+function toggleBrandDefault(group,idx){} // placeholder — brands always show, no toggle needed
+function deleteBrand(group,idx) {
+  if(!confirm('Remove this brand?')) return;
+  DB.brands[group].splice(idx,1);renderBrandsView();
+}
+function bvAddBrand(group) {
+  const name=prompt('Enter brand name:','');if(!name||!name.trim())return;
+  const nm=name.trim();
+  if([...DB.brands.phone,...DB.brands.acc,...DB.brands.router].find(b=>b.name.toLowerCase()===nm.toLowerCase())){alert('Brand already exists');return;}
+  const colors=['#1a4fa0','#1a7a4a','#c0392b','#92600a','#5b21b6'];
+  const bgs=['#e8effe','#e6f4ec','#fdecea','#fef3dc','#f5f3ff'];
+  const ri=Math.floor(Math.random()*5);
+  DB.brands[group].push({name:nm,color:colors[ri],bg:bgs[ri],custom:true});
+  renderBrandsView();
+}
+function renderVariantChips() {
+  const el=document.getElementById('bv-variants');
+  el.innerHTML=DB.variants.map((v,i)=>`
+    <span class="variant-chip" id="vc-${i}">
+      ${v}
+      <span onclick="deleteVariant(${i})" style="cursor:pointer;opacity:.5;font-size:9px;margin-left:2px">✕</span>
+    </span>`).join('');
+}
+function deleteVariant(i){if(!confirm('Remove variant "'+DB.variants[i]+'"?'))return;DB.variants.splice(i,1);renderVariantChips();}
+function bvAddVariant() {
+  const v=prompt('Enter variant (e.g. 8/128 or 256GB):','');if(!v||!v.trim())return;
+  if(DB.variants.includes(v.trim())){alert('Already exists');return;}
+  DB.variants.push(v.trim());renderVariantChips();
+  document.getElementById('bv-total-variants').textContent=DB.variants.length;
+}
+function renderBrandProducts() {
+  const bf=document.getElementById('bv-filter-brand')?.value||'';
+  let prods=DB.products;if(bf)prods=prods.filter(p=>p.brand===bf);
+  const tbody=document.getElementById('bv-prod-tbody');
+  if(!prods.length){tbody.innerHTML='<tr><td colspan="7" class="nr">'+(bf?'No products with brand: '+bf:'No products in catalog')+'</td></tr>';return;}
+  const allBrands=[...DB.brands.phone,...DB.brands.acc,...DB.brands.router];
+  tbody.innerHTML=prods.map(p=>{
+    const{wac,stock}=computeWAC(p.id);const bInfo=allBrands.find(b=>b.name===p.brand);
+    const brandBadge=p.brand?`<span style="background:${bInfo?.bg||'var(--s3)'};color:${bInfo?.color||'var(--ink2)'};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600">${p.brand}</span>`:'<span style="color:var(--ink3);font-size:11px">—</span>';
+    const variantBadge=p.variant?`<span style="background:var(--pul);color:var(--put);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;font-family:var(--mono)">${p.variant}</span>`:'<span style="color:var(--ink3);font-size:11px">—</span>';
+    return`<tr><td><strong>${p.name}</strong> <span style="font-size:10px;color:var(--ink3)">${p.id}</span></td><td>${brandBadge}</td><td>${variantBadge}</td><td><span class="tag tg-m">${p.cat}</span></td><td class="mono ${stock<=p.alert?'wn':'up'}">${stock}</td><td class="mono" style="color:var(--bt)">${fmt(wac)}</td><td class="mono">${fmt(p.sell)}</td></tr>`;
+  }).join('');
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
+});
+
+// ═══ INIT ═══
+document.getElementById('tb-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+['pf-date','pu-date','ex-date','em-join','sl-date','sh-date','fse-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=today();});
+refreshCatSelects();refreshExCatSelect();updateBackupStatus();
+fseAddRow();
+puSnAddRow();
+
+// Demo data
+['Rahim','Karim','Salam'].forEach((n,i)=>DB.employees.push({id:'EMP00'+(i+1),name:n,role:'Salesperson',sal:[7000,6500,4500][i],phone:'',join:'2026-01-01',comm:2.5}));
+const demoP=[
+  {name:'Nokia 105',      brand:'Nokia',   variant:'',       cat:'Feature Phone',type:'mobile', sell:2700, alert:3,  qty:5,  cost:2200, date:'2026-04-19'},
+  {name:'Samsung A15',    brand:'Samsung', variant:'4/128',  cat:'Mobile Phone', type:'mobile', sell:18000,alert:3,  qty:8,  cost:14000,date:'2026-04-01'},
+  {name:'Realme C67',     brand:'Realme',  variant:'6/128',  cat:'Mobile Phone', type:'mobile', sell:16500,alert:2,  qty:5,  cost:12500,date:'2026-04-05'},
+  {name:'Vivo Y18',       brand:'Vivo',    variant:'4/64',   cat:'Mobile Phone', type:'mobile', sell:14000,alert:2,  qty:4,  cost:10500,date:'2026-04-05'},
+  {name:'USB Cable Type-C',brand:'Baseus', variant:'',       cat:'Cables',       type:'regular',sell:150,  alert:10, qty:30, cost:80,   date:'2026-04-01'},
+  {name:'Phone Charger 20W',brand:'Anker', variant:'',       cat:'Accessories',  type:'regular',sell:550,  alert:5,  qty:12, cost:350,  date:'2026-04-01'},
+  {name:'TP-Link AC1200',  brand:'TP-Link',variant:'',       cat:'Router',       type:'serial', sell:3200, alert:2,  qty:6,  cost:2200, date:'2026-04-10'},
+  {name:'Screen Protector',brand:'',       variant:'',       cat:'Accessories',  type:'regular',sell:120,  alert:15, qty:60, cost:40,   date:'2026-04-01'},
+];
+demoP.forEach(d=>{const id='P'+(DB.products.length+1).toString().padStart(3,'0');DB.products.push({id,name:d.name,brand:d.brand,variant:d.variant,cat:d.cat,type:d.type,sell:d.sell,alert:d.alert,openingQty:d.qty,openingCost:d.cost,openingDate:d.date,serials:[],imeis:[]});});
+DB.purchases.push({id:'PU001',pid:'P001',prodName:'Nokia 105',qty:5,price:2250,date:'2026-04-29',sup:'Dhaka Supplier',ref:'INV-001',serials:[],imeis:['352999111234501','352999111234502','352999111234503','352999111234504','352999111234505']});
+DB.products[0].imeis=['352999111234501','352999111234502','352999111234503','352999111234504','352999111234505'];
+const now=new Date();const dS=(d,emp,pid,qty,sell)=>{const dt=new Date(now);dt.setDate(dt.getDate()-d);const p=DB.products.find(x=>x.id===pid);const wac=computeWAC(pid).wac;DB.sales.push({id:DB.sales.length+1,date:dt.toISOString(),emp,pid,prodName:p?.name||'',qty,wacAtSale:wac,unitSell:sell,sell:sell*qty,profit:(sell-wac)*qty,imei:'',serial:'',cust:'Customer',status:'active'});};
+['P001','P002','P003','P004','P005'].forEach(pid=>{dS(3,'Rahim',pid,2,DB.products.find(p=>p.id===pid)?.sell||0);dS(5,'Karim',pid,1,DB.products.find(p=>p.id===pid)?.sell||0);});
+dS(1,'Rahim','P003',3,16500);dS(1,'Rahim','P003',2,16500);dS(2,'Karim','P005',2,550);
+DB.expenses.push({id:1,cat:'Rent',amt:8000,date:'2026-04-01',desc:'April rent'},{id:2,cat:'Salary',amt:18000,date:'2026-04-30',desc:'April salaries'});
+refreshCatSelects();refreshAllSelects();renderDash();renderProducts();renderEmps();renderShTable();renderSaleLog();updateAlerts();
+</script>
+</body>
+</html>
